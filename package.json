@@ -1,0 +1,27 @@
+{
+  "name": "charity",
+  "version": "1.0.0",
+  "description": "A discord bot with information, progress, and monitors for pxls.space factions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mikarific/Charity.git"
+  },
+  "keywords": [
+    "Pxls"
+  ],
+  "author": "Mikarific",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mikarific/Charity/issues"
+  },
+  "homepage": "https://github.com/Mikarific/Charity#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "fs": "0.0.1-security"
+  }
+}
