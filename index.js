@@ -3,6 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 
+const pxls = require('./pxls');
+
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
@@ -18,6 +20,7 @@ for (const file of commandFiles) {
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity(`pxls.space | ${process.env.BOT_PREFIX}help`, {type: 'WATCHING'});
+    pxls.init();
 });
 
 client.on('message', message => {
