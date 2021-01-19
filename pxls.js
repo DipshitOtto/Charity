@@ -3,98 +3,114 @@ require('dotenv').config();
 const WebSocket = require('ws');
 
 const axios = require('axios');
-const PNG = require('pngjs').PNG;
+const Jimp = require('jimp');
 
 let info;
 let board;
 
+const failedPixels = [];
+
 module.exports = {
-    async init() {
-        const ws = new WebSocket(process.env.PXLS_WEBSOCKET);
+	async init() {
+		const ws = new WebSocket(process.env.PXLS_WEBSOCKET);
 
-        ws.on('open', async function open() {
-            console.log('WebSocket Connected.');
+		ws.on('open', async function open() {
+			console.log('WebSocket Connected.');
 
-            try {
-                info = await axios.get(`${process.env.PXLS_URL}info`, {responseType: 'json'});
-                const boardData = await axios.get(`${process.env.PXLS_URL}boarddata`, {responseType: 'arraybuffer'});
+			try {
+				info = await axios.get(`${process.env.PXLS_URL}info`, { responseType: 'json' });
+				const boardData = await axios.get(`${process.env.PXLS_URL}boarddata`, { responseType: 'arraybuffer' });
 
-                board = new PNG({
-                    width: info.data.width,
-                    height: info.data.height,
-                    filterType: -1
-                });
+				board = new Jimp(info.data.width, info.data.height, 0x00000000, err => {
+					if (err) throw err;
+				});
 
-                for (let y = 0; y < board.height; y++) {
-                    for (let x = 0; x < board.width; x++) {
+				board.scan(0, 0, board.bitmap.width, board.bitmap.height, function(x, y, idx) {
+					const red = this.bitmap.data[idx + 0];
+					const green = this.bitmap.data[idx + 1];
+					const blue = this.bitmap.data[idx + 2];
+					const alpha = this.bitmap.data[idx + 3];
 
-                        let index = board.width * y + x;
-                        let idx = index << 2;
-                        let paletteIndex = boardData.data[index];
+					const index = boardData.data[board.bitmap.width * y + x];
+					if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
+						if(index === 255) return;
+						const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+						board.bitmap.data[idx] = parseInt(color[1], 16);
+						board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+						board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+						board.bitmap.data[idx + 3] = 255;
+					}
+				});
+				for(let i = 0; i < failedPixels.length; i++) {
+					const x = failedPixels[i].x;
+					const y = failedPixels[i].y;
 
-                        if(board.data[idx] === 0 && board.data[idx+1] === 0 && board.data[idx+2] === 0 && board.data[idx+3] === 0) {
-                            if(paletteIndex === 255) {
-                                board.data[idx  ] = 0;
-                                board.data[idx+1] = 0;
-                                board.data[idx+2] = 0;
-                                board.data[idx+3] = 0;
-                            } else {
-                                let color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[paletteIndex].value);
+					const idx = (board.bitmap.width * y + x) << 2;
 
-                                board.data[idx  ] = parseInt(color[1], 16);
-                                board.data[idx+1] = parseInt(color[2], 16);
-                                board.data[idx+2] = parseInt(color[3], 16);
-                                board.data[idx+3] = 255;
-                            }
-                        }
-                    }
-                }
-                console.log("Board initialized!");
-            } catch (error) {
-                console.error(error);
-            }
-        });
+					const red = board.bitmap.data[idx + 0];
+					const green = board.bitmap.data[idx + 1];
+					const blue = board.bitmap.data[idx + 2];
+					const alpha = board.bitmap.data[idx + 3];
 
-        ws.on('close', function close() {
-            console.log('WebSocket Disconnected.');
-            module.exports.init();
-        });
+					const index = failedPixels[i].color;
+					if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
+						if(index === 255) return;
+						const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+						board.bitmap.data[idx] = parseInt(color[1], 16);
+						board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+						board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+						board.bitmap.data[idx + 3] = 255;
+					}
+				}
+				console.log('Board initialized!');
+			} catch (error) {
+				console.error(error);
+			}
+		});
 
-        ws.on('message', function incoming(data) {
-            try {
-                data = JSON.parse(data);
-                if(data.type === 'pixel') {
-                    for(let i = 0; i < data.pixels.length; i++) {
-                        let x = data.pixels[i].x;
-                        let y = data.pixels[i].y;
+		ws.on('close', function close() {
+			console.log('WebSocket Disconnected.');
+			module.exports.init();
+		});
 
-                        let idx = (board.width * y + x) << 2;
+		ws.on('message', function incoming(data) {
+			try {
+				data = JSON.parse(data);
+				if(data.type === 'pixel') {
+					for(let i = 0; i < data.pixels.length; i++) {
+						const x = data.pixels[i].x;
+						const y = data.pixels[i].y;
 
-                        if(data.pixels[i].color === 255) {
-                            board.data[idx  ] = 0;
-                            board.data[idx+1] = 0;
-                            board.data[idx+2] = 0;
-                            board.data[idx+3] = 0;
-                        } else {
-                            let color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[data.pixels[i].color].value);
+						const idx = (board.bitmap.width * y + x) << 2;
 
-                            board.data[idx  ] = parseInt(color[1], 16);
-                            board.data[idx+1] = parseInt(color[2], 16);
-                            board.data[idx+2] = parseInt(color[3], 16);
-                            board.data[idx+3] = 255;
-                        }
-                    }
-                }
-            } catch (error) {
-                if(data.type === 'pixel') {
-                    console.log('Couldn\'t update pixel! Board still initializing?');
-                } else {
-                    console.error(error);
-                }
-            }
-        });
-    },
-    board() {
-        return board;
-    }
+						const red = board.bitmap.data[idx + 0];
+						const green = board.bitmap.data[idx + 1];
+						const blue = board.bitmap.data[idx + 2];
+						const alpha = board.bitmap.data[idx + 3];
+
+						const index = data.pixels[i].color;
+						if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
+							if(index === 255) return;
+							const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+							board.bitmap.data[idx] = parseInt(color[1], 16);
+							board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+							board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+							board.bitmap.data[idx + 3] = 255;
+						}
+					}
+				}
+			} catch (error) {
+				if(data.type === 'pixel') {
+					for(let i = 0; i < data.pixels.length; i++) {
+						failedPixels.push(data.pixels[i]);
+					}
+				} else {
+					console.error(error);
+				}
+			}
+		});
+	},
+	board() {
+		return board;
+	},
 };
