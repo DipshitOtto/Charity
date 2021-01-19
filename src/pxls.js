@@ -109,6 +109,9 @@ module.exports = {
 			}
 		});
 	},
+	info() {
+		return info;
+	},
 	board() {
 		return board;
 	},
