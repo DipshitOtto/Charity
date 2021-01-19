@@ -13,7 +13,7 @@ module.exports = {
 	permissions: '',
 	cooldown: 1,
 	execute(message, args) {
-		fs.readFile('./assets/profile.png', function(err, buffer) {
+		fs.readFile('./src/assets/profile.png', function(err, buffer) {
 			if (err) throw err;
 			const data = [];
 			const { commands } = message.client;

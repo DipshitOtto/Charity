@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 const WebSocket = require('ws');
-
 const axios = require('axios');
 const Jimp = require('jimp');
 

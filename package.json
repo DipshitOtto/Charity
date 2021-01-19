@@ -2,9 +2,9 @@
   "name": "charity",
   "version": "1.0.0",
   "description": "A discord bot with information, progress, and monitors for pxls.space factions.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
     "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
     "jimp": "^0.16.1",
+    "mongodb": "^3.6.3",
     "ws": "^7.4.2"
   },
   "devDependencies": {
