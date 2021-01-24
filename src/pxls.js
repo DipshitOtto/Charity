@@ -110,7 +110,7 @@ module.exports = {
 		});
 	},
 	info() {
-		return info;
+		return info.data;
 	},
 	board() {
 		return board;

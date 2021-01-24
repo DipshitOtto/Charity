@@ -3,7 +3,7 @@ require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 
 module.exports = {
-	async getTemplate(name, gid) {
+	async getTemplate(name, gid, canvasCode) {
 		const mongo = new MongoClient(process.env.DB_CONNECTION, {
 			useUnifiedTopology: true,
 		});
@@ -12,10 +12,16 @@ module.exports = {
 			const database = mongo.db('charity');
 			const templates = database.collection('templates');
 
-			const result = await templates.findOne({
+			const data = {
 				name: name,
 				gid: gid,
-			});
+			};
+
+			if (canvasCode != undefined || canvasCode != null) {
+				data.canvasCode = canvasCode;
+			}
+
+			const result = await templates.findOne(data);
 
 			return result;
 		} finally {
@@ -92,7 +98,7 @@ module.exports = {
 			await mongo.close();
 		}
 	},
-	async listTemplates(gid) {
+	async listTemplates(gid, canvasCode) {
 		const mongo = new MongoClient(process.env.DB_CONNECTION, {
 			useUnifiedTopology: true,
 		});
@@ -103,7 +109,15 @@ module.exports = {
 
 			const results = [];
 
-			const find = await templates.find({ gid: gid });
+			const data = {
+				gid: gid,
+			};
+
+			if (canvasCode != undefined || canvasCode != null) {
+				data.canvasCode = canvasCode;
+			}
+
+			const find = await templates.find(data);
 
 			await find.forEach(result => {
 				results.push(result);

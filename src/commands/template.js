@@ -2,9 +2,11 @@ require('dotenv').config();
 
 const fs = require('fs');
 const Discord = require('discord.js');
+const axios = require('axios');
 
 const pxls = require('../pxls');
 const database = require('../handlers/database');
+const canvas = require('../handlers/canvas');
 
 module.exports = {
 	name: 'template',
@@ -51,6 +53,8 @@ module.exports = {
 							`ox: ${template.ox},\n` +
 							`oy: ${template.oy},\n` +
 							`width: ${template.width},\n` +
+							`height: ${template.height},\n` +
+							`scaleFactor: ${template.scaleFactor},\n` +
 							`reference: '${template.reference}'\`\`\``);
 
 					return message.channel.send(embed);
@@ -68,9 +72,15 @@ module.exports = {
 
 					return message.channel.send(embed);
 				});
+			} else if (args[0] === 'list') {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setDescription(':x: Can\'t use list as a template name!');
+
+				return message.channel.send(embed);
 			} else if (!!args[1].match(/[#&?]title=.*?(&|$)/g) && !!args[1].match(/[#&?]template=.*?(&|$)/g) && !!args[1].match(/[#&?]ox=.*?(&|$)/g) && !!args[1].match(/[#&?]oy=.*?(&|$)/g) && !!args[1].match(/[#&?]tw=.*?(&|$)/g)) {
 				const data = {
-					canvasCode: pxls.info().data.canvasCode,
+					canvasCode: pxls.info().canvasCode,
 					gid: message.guild.id,
 					name: args[0],
 					hidden: false,
@@ -81,6 +91,12 @@ module.exports = {
 					width: parseInt(decodeURIComponent(args[1].match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
 					reference: args[1],
 				};
+
+				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
+
+				data.scaleFactor = await canvas.scaleFactor(image.data, data.width);
+				data.height = await canvas.height(image.data, data.scaleFactor);
+				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 
 				await database.addTemplate(args[0], message.guild.id, data);
 
@@ -105,6 +121,8 @@ module.exports = {
 						`ox: ${template.ox},\n` +
 						`oy: ${template.oy},\n` +
 						`width: ${template.width},\n` +
+						`height: ${template.height},\n` +
+						`scaleFactor: ${template.scaleFactor},\n` +
 						`reference: '${template.reference}'\`\`\``);
 
 				return message.channel.send(embed);
@@ -170,6 +188,14 @@ module.exports = {
 					data = {
 						width: parseInt(value),
 					};
+				} else if (argument === 'height') {
+					data = {
+						width: parseInt(value),
+					};
+				} else if (argument === 'scaleFactor') {
+					data = {
+						width: parseInt(value),
+					};
 				} else if (argument === 'reference') {
 					if (!!value.match(/[#&?]title=.*?(&|$)/g) && !!value.match(/[#&?]template=.*?(&|$)/g) && !!value.match(/[#&?]ox=.*?(&|$)/g) && !!value.match(/[#&?]oy=.*?(&|$)/g) && !!value.match(/[#&?]tw=.*?(&|$)/g)) {
 						data = {
@@ -180,6 +206,12 @@ module.exports = {
 							width: parseInt(decodeURIComponent(value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
 							reference: value,
 						};
+
+						const image = await axios.get(data.image, { responseType: 'arraybuffer' });
+
+						data.scaleFactor = await canvas.scaleFactor(image.data, data.width);
+						data.height = await canvas.height(image.data, data.scaleFactor);
+						data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 					} else {
 						data = {
 							reference: value,
@@ -188,8 +220,7 @@ module.exports = {
 				} else {
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
-						.setDescription(`:x: Argument \`${argument}\` does not exist!`);
-
+						.setDescription(`:x: Argument \`${argument}\` does not exist!\nUse \`${process.env.BOT_PREFIX}template view ${templateName}\` to see arguments.`);
 					return message.channel.send(embed);
 				}
 
@@ -216,6 +247,8 @@ module.exports = {
 							`ox: ${template.ox},\n` +
 							`oy: ${template.oy},\n` +
 							`width: ${template.width},\n` +
+							`height: ${template.height},\n` +
+							`scaleFactor: ${template.scaleFactor},\n` +
 							`reference: '${template.reference}'\`\`\``);
 
 					return message.channel.send(embed);
