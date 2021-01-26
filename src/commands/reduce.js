@@ -31,7 +31,7 @@ module.exports = {
 
 			return message.channel.send(embed);
 		}
-		const buffer = await canvas.reduce(image.data, pxls.info().data.palette);
+		const buffer = await canvas.reduce(image.data, pxls.info().palette);
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)

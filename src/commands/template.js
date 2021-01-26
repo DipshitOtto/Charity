@@ -13,7 +13,7 @@ module.exports = {
 	description: 'View/Add/Edit/Remove a template in the progress checker.',
 	aliases: ['project', 'temp'],
 	args: true,
-	usage: '<view|add|edit|remove|list>',
+	usage: '<"view"|"add"|"edit"|"remove"|"list">',
 	guildOnly: true,
 	permissions: 'MANAGE_GUILD',
 	cooldown: 3,

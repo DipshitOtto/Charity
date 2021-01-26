@@ -11,7 +11,7 @@ module.exports = {
 	description: 'Check the progress of any template in the progress checker.',
 	aliases: ['check'],
 	args: false,
-	usage: '[template name] [template|actual]',
+	usage: '[template name] ["template"|"actual"]',
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,
