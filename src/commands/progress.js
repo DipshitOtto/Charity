@@ -17,7 +17,7 @@ module.exports = {
 	cooldown: 10,
 	async execute(message, args) {
 		if (args.length < 1 || args[0] === 'list') {
-			const templates = await database.listTemplates(message.guild.id, pxls.info.canvasCode);
+			const templates = await database.listTemplates(message.guild.id, pxls.info().canvasCode);
 
 			const results = [];
 
