@@ -18,7 +18,7 @@ module.exports = {
 	permissions: '',
 	cooldown: 3,
 	async execute(message, args) {
-		if (message.author.id === process.env.BOT_OWNER || message.hasPermission('MANAGE_GUILD')) {
+		if (message.author.id === process.env.BOT_OWNER || message.member.hasPermission('MANAGE_GUILD')) {
 			const command = args.shift().toLowerCase();
 
 			if (command === 'view') {
