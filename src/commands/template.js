@@ -157,7 +157,7 @@ module.exports = {
 						};
 					} else if (argument === 'name') {
 						data = {
-							name: value,
+							name: value.trim().split(/ +/).shift(),
 						};
 					} else if (argument === 'hidden') {
 						if (value === 'true') {

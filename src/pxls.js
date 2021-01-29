@@ -82,11 +82,6 @@ module.exports = {
 
 						const idx = (board.bitmap.width * y + x) << 2;
 
-						const red = board.bitmap.data[idx + 0];
-						const green = board.bitmap.data[idx + 1];
-						const blue = board.bitmap.data[idx + 2];
-						const alpha = board.bitmap.data[idx + 3];
-
 						const index = data.pixels[i].color;
 						console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
 						if(index === 255) return;
