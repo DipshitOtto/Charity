@@ -147,7 +147,7 @@ module.exports = {
 						return message.channel.send(embed);
 					});
 				} else {
-					let templateName = args.shift();
+					const templateName = args.shift();
 					const argument = args.shift();
 					const value = args.join(' ');
 					let data = null;
@@ -156,7 +156,6 @@ module.exports = {
 							canvasCode: value,
 						};
 					} else if (argument === 'name') {
-						templateName = value.trim().split(/ +/).shift();
 						data = {
 							name: value.trim().split(/ +/).shift(),
 						};
@@ -228,7 +227,7 @@ module.exports = {
 
 					await database.editTemplate(templateName, message.guild.id, data);
 
-					const template = await database.getTemplate(templateName, message.guild.id);
+					const template = await database.getTemplate(value.trim().split(/ +/).shift(), message.guild.id);
 
 					if (template == null) {
 						const embed = new Discord.MessageEmbed()
