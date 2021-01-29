@@ -88,14 +88,13 @@ module.exports = {
 						const alpha = board.bitmap.data[idx + 3];
 
 						const index = data.pixels[i].color;
-						if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
-							if(index === 255) return;
-							const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
-							board.bitmap.data[idx] = parseInt(color[1], 16);
-							board.bitmap.data[idx + 1] = parseInt(color[2], 16);
-							board.bitmap.data[idx + 2] = parseInt(color[3], 16);
-							board.bitmap.data[idx + 3] = 255;
-						}
+						console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
+						if(index === 255) return;
+						const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+						board.bitmap.data[idx] = parseInt(color[1], 16);
+						board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+						board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+						board.bitmap.data[idx + 3] = 255;
 					}
 				}
 			} catch (error) {
