@@ -147,7 +147,7 @@ module.exports = {
 						return message.channel.send(embed);
 					});
 				} else {
-					const templateName = args.shift();
+					let templateName = args.shift();
 					const argument = args.shift();
 					const value = args.join(' ');
 					let data = null;
@@ -156,6 +156,7 @@ module.exports = {
 							canvasCode: value,
 						};
 					} else if (argument === 'name') {
+						templateName = value.trim().split(/ +/).shift();
 						data = {
 							name: value.trim().split(/ +/).shift(),
 						};
