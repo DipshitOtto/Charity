@@ -15,32 +15,44 @@ module.exports = {
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,
-	async execute(message, args) {
-		const processing = await message.channel.send({
-			embed: {
-				title: '🔄 Processing...',
-				color: process.env.BOT_COLOR,
-			},
-		});
+	options: [
+		{
+			'type': 3,
+			'name': 'link',
+			'description': 'The link to the image you are reducing.',
+			'default': false,
+			'required': true,
+		},
+	],
+	async execute(interaction, client) {
+		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
+		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
 
-		const image = await axios.get(args[0], { responseType: 'arraybuffer' });
+		const link = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'link').value : null;
+
+		const image = await axios.get(link, { responseType: 'arraybuffer' });
 		if (image.data === undefined || image.data === null) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: Invalid image link!');
 
-			return message.channel.send(embed);
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
 		}
 		const buffer = await canvas.reduce(image.data, pxls.info().palette);
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Reduced!')
-			.attachFiles([buffer])
 			.setImage('attachment://file.jpg');
 
-		return message.channel.send(embed).then(() => {
-			processing.delete({ timeout: 0 });
+		return webhook.editMessage('@original', {
+			embeds: [embed.toJSON()],
+			files: [{
+				attachment: buffer,
+				name: 'file.jpg',
+			}],
 		});
 	},
 };

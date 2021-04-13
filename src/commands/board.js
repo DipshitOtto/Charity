@@ -10,27 +10,27 @@ module.exports = {
 	aliases: ['canvas'],
 	args: false,
 	usage: '',
-	guildOnly: false,
+	guildOnly: true,
 	permissions: '',
 	cooldown: 10,
-	async execute(message) {
-		const processing = await message.channel.send({
-			embed: {
-				title: '🔄 Processing...',
-				color: process.env.BOT_COLOR,
-			},
-		});
+	options: [],
+	async execute(interaction, client) {
+		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
+		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
 
 		const board = await canvas.board();
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Board!')
-			.attachFiles([board])
 			.setImage('attachment://file.jpg');
 
-		message.channel.send(embed).then(() => {
-			processing.delete({ timeout: 0 });
+		webhook.editMessage('@original', {
+			embeds: [embed.toJSON()],
+			files: [{
+				attachment: board,
+				name: 'file.jpg',
+			}],
 		});
 	},
 };

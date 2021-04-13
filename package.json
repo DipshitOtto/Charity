@@ -22,7 +22,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "cwebp": "^2.0.5",
-    "discord.js": "^12.5.1",
+    "discord.js": "github:discordjs/discord.js",
     "dotenv": "^8.2.0",
     "file-type": "^16.2.0",
     "fs": "0.0.1-security",

@@ -14,17 +14,24 @@ module.exports = {
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,
-	async execute(message, args) {
-		if (!!args[0].match(/[#&?]template=.*?(&|$)/g) && !!args[0].match(/[#&?]tw=.*?(&|$)/g)) {
-			const processing = await message.channel.send({
-				embed: {
-					title: '🔄 Processing...',
-					color: process.env.BOT_COLOR,
-				},
-			});
+	options: [
+		{
+			'type': 3,
+			'name': 'link',
+			'description': 'The link to the template you are detemplatizing.',
+			'default': false,
+			'required': true,
+		},
+	],
+	async execute(interaction, client) {
+		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
+		const templateLink = interaction.data.options.find(option => option.name == 'link').value;
 
-			const template = decodeURIComponent(args[0].match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
-			const width = parseInt(decodeURIComponent(args[0].match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g)));
+		if (!!templateLink.match(/[#&?]template=.*?(&|$)/g) && !!templateLink.match(/[#&?]tw=.*?(&|$)/g)) {
+			client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+
+			const template = decodeURIComponent(templateLink.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
+			const width = parseInt(decodeURIComponent(templateLink.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g)));
 
 			const image = await axios.get(template, { responseType: 'arraybuffer' });
 			const buffer = await canvas.detemplatize(image.data, width);
@@ -32,18 +39,26 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Detemplatized!')
-				.attachFiles([buffer])
 				.setImage('attachment://file.jpg');
 
-			return message.channel.send(embed).then(() => {
-				processing.delete({ timeout: 0 });
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+				files: [{
+					attachment: buffer,
+					name: 'file.jpg',
+				}],
 			});
 		} else {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: Invalid template link!');
 
-			return message.channel.send(embed);
+			return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+				type: 4,
+				data: {
+					embeds: [embed.toJSON()],
+				},
+			} });
 		}
 	},
 };

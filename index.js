@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 
 const pxls = require('./src/pxls');
 
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
 client.commands = new Discord.Collection();
 
 const cooldowns = new Discord.Collection();
@@ -19,39 +19,29 @@ for (const file of commandFiles) {
 
 client.once('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setActivity(`pxls.space | ${process.env.BOT_PREFIX}help`, { type: 'WATCHING' });
+	client.user.setActivity('pxls.space', { type: 'WATCHING' });
 	pxls.init();
 });
 
-client.on('message', (message) => {
-	if (!message.content.startsWith(process.env.BOT_PREFIX) || message.author.bot) return;
+client.ws.on('INTERACTION_CREATE', async interaction => {
+	interaction.timestamp = Date.now();
+	const guild = ((interaction.guild_id) ? client.guilds.cache.get(interaction.guild_id) : null);
+	const channel = client.channels.cache.get(interaction.channel_id);
+	const user = await ((interaction.member.user.id) ? client.users.fetch(interaction.member.user.id) : client.users.fetch(interaction.user.id));
 
-	const args = message.content.slice(process.env.BOT_PREFIX.length).trim().split(/ +/);
-	const commandName = args.shift().toLowerCase();
-
-	const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+	const command = client.commands.get(interaction.data.name) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(interaction.data.name));
 
 	if (!command) return;
 
-	if (command.guildOnly && message.channel.type === 'dm') {
-		return message.reply('I can\'t execute that command inside DMs!');
+	if (command.guildOnly && !guild) {
+		new Discord.WebhookClient(client.user.id, interaction.token).send('I can\'t execute that command inside DMs!');
 	}
 
-	if (command.permissions) {
-		const authorPerms = message.channel.permissionsFor(message.author);
+	if (command.permissions && interaction.member.permissions) {
+		const authorPerms = channel.permissionsFor(user);
 		if (!authorPerms || !authorPerms.has(command.permissions)) {
-			return message.channel.send(':x: You can not do this!');
+			return new Discord.WebhookClient(client.user.id, interaction.token).send(':x: You can not do this!');
 		}
-	}
-
-	if (command.args && !args.length) {
-		let reply = ':x: You didn\'t provide any arguments!';
-
-		if (command.usage) {
-			reply += `\nThe proper usage would be: \`${process.env.BOT_PREFIX}${command.name} ${command.usage}\``;
-		}
-
-		return message.channel.send(reply);
 	}
 
 	if (!cooldowns.has(command.name)) {
@@ -62,23 +52,23 @@ client.on('message', (message) => {
 	const timestamps = cooldowns.get(command.name);
 	const cooldownAmount = (command.cooldown || 3) * 1000;
 
-	if (timestamps.has(message.author.id)) {
-		const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+	if (timestamps.has(user.id)) {
+		const expirationTime = timestamps.get(user.id) + cooldownAmount;
 
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
-			return message.channel.send(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${process.env.BOT_PREFIX}${command.name}\` command.`);
+			return new Discord.WebhookClient(client.user.id, interaction.token).send(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${process.env.BOT_PREFIX}${command.name}\` command.`);
 		}
 	} else {
-		timestamps.set(message.author.id, now);
-		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+		timestamps.set(user.id, now);
+		setTimeout(() => timestamps.delete(user.id), cooldownAmount);
 	}
 
 	try {
-		command.execute(message, args);
+		command.execute(interaction, client);
 	} catch (error) {
 		console.error(error);
-		message.channel.send(':x: There was an error trying to execute that command!');
+		new Discord.WebhookClient(client.user.id, interaction.token).send(':x: There was an error trying to execute that command!');
 	}
 });
 

@@ -10,16 +10,25 @@ module.exports = {
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
-	execute(message) {
+	options: [],
+	execute(interaction, client) {
 		fs.readFile('./src/assets/profile.png', function(err, buffer) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('🏓 Pong!')
-				.setDescription(`${message.client.user.username}'s ping is \`${Date.now() - message.createdTimestamp}ms\`.\nThe websocket ping is \`${Math.round(message.client.ws.ping)}ms\`.`)
-				.attachFiles([buffer])
+				.setDescription(`${(interaction.member.user.username) ? interaction.member.user.username : interaction.user.username}'s ping is \`${Date.now() - interaction.timestamp}ms\`.\nThe websocket ping is \`${Math.round(client.ws.ping)}ms\`.`)
 				.setThumbnail('attachment://file.jpg');
 
-			message.channel.send(embed);
+			client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+				type: 4,
+				data: {
+					embeds: [embed.toJSON()],
+					files: [{
+						attachment: buffer,
+						name: 'file.jpg',
+					}],
+				},
+			} });
 		});
 	},
 };

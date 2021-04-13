@@ -9,10 +9,11 @@ let board;
 
 const failedPixels = [];
 
+let ws;
+
 module.exports = {
 	async init() {
-		const ws = new WebSocket(process.env.PXLS_WEBSOCKET);
-
+		ws = new WebSocket(process.env.PXLS_WEBSOCKET);
 		ws.on('open', async function open() {
 			console.log('WebSocket Connected.');
 
@@ -83,7 +84,7 @@ module.exports = {
 						const idx = (board.bitmap.width * y + x) << 2;
 
 						const index = data.pixels[i].color;
-						console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
+						// console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
 						if(index === 255) return;
 						const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
 						board.bitmap.data[idx] = parseInt(color[1], 16);

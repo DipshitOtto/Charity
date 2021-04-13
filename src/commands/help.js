@@ -12,11 +12,22 @@ module.exports = {
 	guildOnly: false,
 	permissions: '',
 	cooldown: 1,
-	execute(message, args) {
+	options: [
+		{
+			'type': 3,
+			'name': 'command',
+			'description': 'The command to get info about.',
+			'default': false,
+			'required': false,
+		},
+	],
+	execute(interaction, client) {
+		const argument = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'command').value : null;
+
 		fs.readFile('./src/assets/profile.png', function(err, buffer) {
 			if (err) throw err;
 			const data = [];
-			const { commands } = message.client;
+			const { commands } = client;
 
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
@@ -24,39 +35,52 @@ module.exports = {
 				.attachFiles([buffer])
 				.setThumbnail('attachment://file.jpg');
 
-			if (!args.length) {
+			if (!argument) {
 				for(const command of commands) {
 					if(command[1].usage && command[1].usage.trim() != '') {
-						data.push(`• \`${process.env.BOT_PREFIX}${command[1].name} ${command[1].usage}\` - ${command[1].description}`);
+						data.push(`• \`/${command[1].name} ${command[1].usage}\` - ${command[1].description}`);
 					} else {
-						data.push(`• \`${process.env.BOT_PREFIX}${command[1].name}\` - ${command[1].description}`);
+						data.push(`• \`/${command[1].name}\` - ${command[1].description}`);
 					}
 				}
-				data.push(`\nYou can send \`${process.env.BOT_PREFIX}help [command name]\` to get info on a specific command!`);
+				data.push('\nYou can send `/help [command]` to get info on a specific command!');
 
 				embed.setDescription(data.join('\n'));
 
-				return message.channel.send(embed);
+				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+					type: 4,
+					data: {
+						embeds: [embed.toJSON()],
+					},
+				} });
 			}
 
-			const name = args[0].toLowerCase();
+			const name = argument.toLowerCase();
 			const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 			if (!command) {
-				return message.channel.send(':x: That\'s not a valid command!');
+				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+					type: 4,
+					data: ':x: That\'s not a valid command!',
+				} });
 			}
 
-			data.push(`\`${process.env.BOT_PREFIX}${command.name}\``);
+			data.push(`\`/${command.name}\``);
 
-			if (command.aliases && command.aliases.length > 0) data.push(`**Aliases:** \`${process.env.BOT_PREFIX}${command.aliases.join(`\`, \`${process.env.BOT_PREFIX}`)}\``);
+			if (command.aliases && command.aliases.length > 0) data.push(`**Aliases:** \`/${command.aliases.join('`, `/')}\``);
 			if (command.description) data.push(`**Description:** ${command.description}`);
-			if (command.usage) data.push(`**Usage:** \`${process.env.BOT_PREFIX}${command.name} ${command.usage}\``);
+			if (command.usage) data.push(`**Usage:** \`/${command.name} ${command.usage}\``);
 
 			data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
 
 			embed.setDescription(data.join('\n'));
 
-			message.channel.send(embed);
+			client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+				type: 4,
+				data: {
+					embeds: [embed.toJSON()],
+				},
+			} });
 		});
 	},
 };
