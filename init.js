@@ -16,10 +16,10 @@ function addCommand(file, index) {
 		axios.post(`https://discord.com/api/v8/applications/${process.env.APP_ID}/commands`, commandJSON, {
 			headers: { Authorization: `Bot ${process.env.BOT_TOKEN}` },
 		}).then(function(response) {
-			if(response.status === 200) {
+			if(response.status === 200 || response.status === 201) {
 				console.log(`Added command ${command.name}.`);
 			} else {
-				console.log(`Couldn't add command ${command.name}. Response code ${response.status}`);
+				console.log(`Couldn't add command ${command.name}. Response code ${response.status}.`);
 			}
 			setTimeout(function() {
 				if(index + 1 < commandFiles.length) {
