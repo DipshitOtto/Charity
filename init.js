@@ -29,8 +29,11 @@ function addCommand(command, index) {
 		axios.post(`https://discord.com/api/v8/applications/${process.env.APP_ID}/commands`, command, {
 			headers: { Authorization: `Bot ${process.env.BOT_TOKEN}` },
 		}).then(function(response) {
-			if(response.status === 200 || response.status === 201) {
+			if(response.status === 201) {
 				console.log(`Added command ${command.name}.`);
+			} else if (response.status === 200) {
+				console.log(`Command ${command.name} already exists. Updating command...`);
+				editCommand(command, response.data.id);
 			} else {
 				console.log(`Couldn't add command ${command.name}. Response code ${response.status}.`);
 			}
@@ -45,6 +48,20 @@ function addCommand(command, index) {
 	} else if(index + 1 < commands.length) {
 		addCommand(commands[index + 1], index + 1);
 	}
+}
+
+function editCommand(command, commandID) {
+	axios.patch(`https://discord.com/api/v8/applications/${process.env.APP_ID}/commands/${commandID}`, command, {
+		headers: { Authorization: `Bot ${process.env.BOT_TOKEN}` },
+	}).then(function(response) {
+		if(response.status === 200) {
+			console.log(`Updated command ${command.name}.`);
+		} else {
+			console.log(`Couldn't update command ${command.name}. Response code ${response.status}.`);
+		}
+	}).catch(function() {
+		console.log(`Couldn't update command ${command.name}. Error.`);
+	});
 }
 
 addCommand(commands[0], 0);
