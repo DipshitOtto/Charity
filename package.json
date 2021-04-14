@@ -28,7 +28,7 @@
     "fs": "0.0.1-security",
     "jimp": "^0.16.1",
     "mongodb": "^3.6.3",
-    "ws": "^7.4.2"
+    "websocket": "^1.0.33"
   },
   "devDependencies": {
     "eslint": "^7.18.0",

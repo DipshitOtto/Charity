@@ -2,11 +2,10 @@ module.exports = {
 	name: 'reload',
 	description: 'Reloads a command.',
 	aliases: [],
-	args: false,
-	usage: '',
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
+	options: [],
 	execute(message, args) {
 		if(message.author.id === process.env.BOT_AUTHOR) return message.channel.send(':x: You don\'t have permission to do that!');
 		if(!args.length) return message.channel.send('You didn\'t pass any command to reload!');

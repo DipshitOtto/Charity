@@ -10,8 +10,6 @@ module.exports = {
 	name: 'reduce',
 	description: 'Reduce a template image to the current Pxls palette.',
 	aliases: ['fiddle'],
-	args: true,
-	usage: '<image link>',
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,

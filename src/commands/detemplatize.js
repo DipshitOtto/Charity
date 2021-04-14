@@ -9,8 +9,6 @@ module.exports = {
 	name: 'detemplatize',
 	description: 'Get the original 1:1 image from a template link.',
 	aliases: ['detemp'],
-	args: true,
-	usage: '<template link>',
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,

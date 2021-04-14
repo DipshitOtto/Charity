@@ -8,8 +8,6 @@ module.exports = {
 	name: 'board',
 	description: 'Gets the current state of the canvas.',
 	aliases: ['canvas'],
-	args: false,
-	usage: '',
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,

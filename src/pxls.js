@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const WebSocket = require('ws');
+const WebSocketClient = require('websocket').client;
 const axios = require('axios');
 const Jimp = require('jimp');
 
@@ -9,13 +9,20 @@ let board;
 
 const failedPixels = [];
 
-let ws;
-
 module.exports = {
 	async init() {
-		ws = new WebSocket(process.env.PXLS_WEBSOCKET);
-		ws.on('open', async function open() {
-			console.log('WebSocket Connected.');
+		const ws = new WebSocketClient();
+
+		ws.on('connectFailed', function(error) {
+			console.log('Websocket Connecting Error: ' + error.toString());
+		});
+
+		ws.on('connect', async function(connection) {
+			console.log('Websocket Connected!');
+
+			connection.on('error', function(error) {
+				console.log('Websocket Error: ' + error.toString());
+			});
 
 			try {
 				info = await axios.get(`${process.env.PXLS_URL}info`, { responseType: 'json' });
@@ -62,47 +69,50 @@ module.exports = {
 						board.bitmap.data[idx + 3] = 255;
 					}
 				}
-				console.log('Board initialized!');
+				console.log('Board Initialized!');
 			} catch (error) {
 				console.error(error);
 			}
-		});
 
-		ws.on('close', function close() {
-			console.log('WebSocket Disconnected.');
-			module.exports.init();
-		});
+			connection.on('close', function() {
+				console.log('Websocket Closed');
+				module.exports.init();
+			});
+			connection.on('message', function(message) {
+				if (message.type === 'utf8') {
+					const data = JSON.parse(message.utf8Data);
+					try {
+						if(data.type === 'pixel') {
+							for(let i = 0; i < data.pixels.length; i++) {
+								const x = data.pixels[i].x;
+								const y = data.pixels[i].y;
 
-		ws.on('message', function incoming(data) {
-			try {
-				data = JSON.parse(data);
-				if(data.type === 'pixel') {
-					for(let i = 0; i < data.pixels.length; i++) {
-						const x = data.pixels[i].x;
-						const y = data.pixels[i].y;
+								const idx = (board.bitmap.width * y + x) << 2;
 
-						const idx = (board.bitmap.width * y + x) << 2;
-
-						const index = data.pixels[i].color;
-						// console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
-						if(index === 255) return;
-						const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
-						board.bitmap.data[idx] = parseInt(color[1], 16);
-						board.bitmap.data[idx + 1] = parseInt(color[2], 16);
-						board.bitmap.data[idx + 2] = parseInt(color[3], 16);
-						board.bitmap.data[idx + 3] = 255;
+								const index = data.pixels[i].color;
+								console.log(`Pixel Placed: x=${x}, y=${y}, color=${index}`);
+								if(index === 255) return;
+								const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+								board.bitmap.data[idx] = parseInt(color[1], 16);
+								board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+								board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+								board.bitmap.data[idx + 3] = 255;
+							}
+						}
+					} catch (error) {
+						if(data.type === 'pixel') {
+							for(let i = 0; i < data.pixels.length; i++) {
+								failedPixels.push(data.pixels[i]);
+							}
+						} else {
+							console.error(error);
+						}
 					}
 				}
-			} catch (error) {
-				if(data.type === 'pixel') {
-					for(let i = 0; i < data.pixels.length; i++) {
-						failedPixels.push(data.pixels[i]);
-					}
-				} else {
-					console.error(error);
-				}
-			}
+			});
 		});
+
+		ws.connect(process.env.PXLS_WEBSOCKET);
 	},
 	info() {
 		return info.data;

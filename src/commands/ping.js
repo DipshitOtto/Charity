@@ -5,8 +5,6 @@ module.exports = {
 	name: 'ping',
 	description: 'Pong!',
 	aliases: [],
-	args: false,
-	usage: '',
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
@@ -16,7 +14,7 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('🏓 Pong!')
-				.setDescription(`${(interaction.member.user.username) ? interaction.member.user.username : interaction.user.username}'s ping is \`${Date.now() - interaction.timestamp}ms\`.\nThe websocket ping is \`${Math.round(client.ws.ping)}ms\`.`)
+				.setDescription(`${client.user.username}'s ping is \`${Date.now() - interaction.timestamp}ms\`.\nThe websocket ping is \`${Math.round(client.ws.ping)}ms\`.`)
 				.setThumbnail('attachment://file.jpg');
 
 			client.api.interactions(interaction.id, interaction.token).callback.post({ data: {

@@ -7,8 +7,6 @@ module.exports = {
 	name: 'help',
 	description: 'List all commands or get info about a specific command.',
 	aliases: ['commands'],
-	args: false,
-	usage: '[command name]',
 	guildOnly: false,
 	permissions: '',
 	cooldown: 1,
@@ -32,25 +30,41 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Help:')
-				.attachFiles([buffer])
 				.setThumbnail('attachment://file.jpg');
 
 			if (!argument) {
 				for(const command of commands) {
-					if(command[1].usage && command[1].usage.trim() != '') {
-						data.push(`• \`/${command[1].name} ${command[1].usage}\` - ${command[1].description}`);
-					} else {
-						data.push(`• \`/${command[1].name}\` - ${command[1].description}`);
+					let usage = '';
+					for (let i = 0; i < command[1].options.length; i++) {
+						if(command[1].options[i].type === 1) {
+							if(i === 0) {
+								usage += ` {${command[1].options[i].name}`;
+							} else if (i === command[1].options.length - 1) {
+								usage += `|${command[1].options[i].name}}`;
+							} else {
+								usage += `|${command[1].options[i].name}`;
+							}
+						} else if(command[1].options[i].required) {
+							usage += ` <${command[1].options[i].name}>`;
+						} else {
+							usage += ` [${command[1].options[i].name}]`;
+						}
 					}
+					data.push(`• \`/${command[1].name}${usage}\` - ${command[1].description}`);
 				}
 				data.push('\nYou can send `/help [command]` to get info on a specific command!');
 
 				embed.setDescription(data.join('\n'));
+				embed.setFooter('<> is a required argument. [] is an optional argument. {} is a set of required items, you must choose one.');
 
 				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
 					type: 4,
 					data: {
 						embeds: [embed.toJSON()],
+						files: [{
+							attachment: buffer,
+							name: 'file.jpg',
+						}],
 					},
 				} });
 			}
@@ -69,7 +83,28 @@ module.exports = {
 
 			if (command.aliases && command.aliases.length > 0) data.push(`**Aliases:** \`/${command.aliases.join('`, `/')}\``);
 			if (command.description) data.push(`**Description:** ${command.description}`);
-			if (command.usage) data.push(`**Usage:** \`/${command.name} ${command.usage}\``);
+
+			if(command.options.length) {
+				let usage = '**Usage:** ';
+				for (let i = 0; i < command.options.length; i++) {
+					if(command.options[i].type === 1) {
+						usage += `\n\`/${command.name} ${command.options[i].name}`;
+						for (let j = 0; j < command.options[i].options.length; j++) {
+							if(command.options[i].options[j].required) {
+								usage += ` <${command.options[i].options[j].name}>`;
+							} else {
+								usage += ` [${command.options[i].options[j].name}]`;
+							}
+						}
+						usage += '`';
+					} else if(command.options[i].required) {
+						usage += `\`/${command.name} <${command.options[i].name}>\``;
+					} else {
+						usage += `\`/${command.name} [${command.options[i].name}]\``;
+					}
+				}
+				data.push(usage);
+			}
 
 			data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
 
@@ -79,6 +114,10 @@ module.exports = {
 				type: 4,
 				data: {
 					embeds: [embed.toJSON()],
+					files: [{
+						attachment: buffer,
+						name: 'file.jpg',
+					}],
 				},
 			} });
 		});
