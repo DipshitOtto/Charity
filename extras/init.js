@@ -7,7 +7,7 @@ const commandFiles = fs.readdirSync('./src/commands').filter((file) => file.ends
 const commands = [];
 
 for (const file of commandFiles) {
-	const command = require(`./src/commands/${file}`);
+	const command = require(`../src/commands/${file}`);
 	if(command.options) {
 		commands.push({
 			'name': command.name,
