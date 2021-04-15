@@ -3,7 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const axios = require('axios');
 
-const commandFiles = fs.readdirSync('./src/commands').filter((file) => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('../src/commands').filter((file) => file.endsWith('.js'));
 const commands = [];
 
 for (const file of commandFiles) {
