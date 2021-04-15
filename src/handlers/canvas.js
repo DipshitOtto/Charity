@@ -220,7 +220,12 @@ module.exports = {
 		} else {
 			const colors = fs.readFileSync('src/assets/colors.json');
 			const palette = JSON.parse(colors);
-			color = palette.find(c => {return c.name.toLowerCase() === color.toLowerCase();}).value;
+			color = palette.find(c => {return c.name.toLowerCase() === color.toLowerCase();});
+			if(color) {
+				color = color.value;
+			} else {
+				return null;
+			}
 		}
 
 		const generated = new Jimp(192, 192, color);

@@ -26,6 +26,16 @@ module.exports = {
 
 		const buffer = await canvas.color(color);
 
+		if(!buffer) {
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setDescription(':x: That color doesn\'t exist!');
+
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
+		}
+
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Color Preview!')
