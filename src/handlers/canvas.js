@@ -1,5 +1,6 @@
 const pxls = require('../pxls');
 
+const fs = require('fs');
 const FileType = require('file-type');
 const DWebp = require('cwebp').DWebp;
 const Jimp = require('jimp');
@@ -77,7 +78,11 @@ module.exports = {
 					for (let px = x * scaleFactor; px < x * scaleFactor + scaleFactor; px++) {
 						for (let py = y * scaleFactor; py < y * scaleFactor + scaleFactor; py++) {
 							if (color === null) {
-								const pixelColor = '0x' + (image.getPixelColor(px, py) >>> 0).toString(16).padStart(8, '0');
+								let pixelColor = '0x' + (image.getPixelColor(px, py) >>> 0).toString(16).padStart(8, '0');
+								if(x == 0 && y == 0) {
+									const a = parseInt('0x' + pixelColor.substring(8));
+									pixelColor = pixelColor.substring(0, pixelColor.length - 2) + (a < 128 ? 0 : 255).toString(16).padStart(2, '0');
+								}
 								if(pixelColor.slice(pixelColor.length - 2) != '00') {
 									color = parseInt(pixelColor.substring(pixelColor.length - 2, 0) + 'ff');
 								} else {
@@ -200,5 +205,65 @@ module.exports = {
 			});
 		}).catch(err => console.error(err));
 		return generated;
+	},
+	async color(color) {
+		if(color.match(/^[a-fA-F0-9]{3}$/g)) {
+			color = ('#' + color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2)).toUpperCase();
+		} else if(color.match(/^#[a-fA-F0-9]{3}$/g)) {
+			color = ('#' + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3)).toUpperCase();
+		} else if(color.match(/^[a-fA-F0-9]{6}$/g)) {
+			color = ('#' + color.charAt(0) + color.charAt(1) + color.charAt(2) + color.charAt(3) + color.charAt(4) + color.charAt(5)).toUpperCase();
+		} else if(color.match(/^#[a-fA-F0-9]{6}$/g)) {
+			color = ('#' + color.charAt(1) + color.charAt(2) + color.charAt(3) + color.charAt(4) + color.charAt(5) + color.charAt(6)).toUpperCase();
+		} else if(color.match(/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$/g)) {
+			color = ('#' + parseInt(color.split(',')[0]).toString(16) + parseInt(color.split(',')[1]).toString(16) + parseInt(color.split(',')[2]).toString(16)).toUpperCase();
+		} else {
+			const colors = fs.readFileSync('src/assets/colors.json');
+			const palette = JSON.parse(colors);
+			color = palette.find(c => {return c.name.toLowerCase() === color.toLowerCase();}).value;
+		}
+
+		const generated = new Jimp(192, 192, color);
+
+		const r = parseInt(color.substring(1, 3), 16);
+		const g = parseInt(color.substring(3, 5), 16);
+		const b = parseInt(color.substring(5, 7), 16);
+		const uicolors = [r / 255, g / 255, b / 255];
+		const c = uicolors.map((col) => {
+			if (col <= 0.03928) {
+				return col / 12.92;
+			}
+			return Math.pow((col + 0.055) / 1.055, 2.4);
+		});
+		const L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
+		const fnt = (L > 0.179) ? 'src/assets/fonts/charity_8_black.fnt' : 'src/assets/fonts/charity_8_white.fnt';
+
+		const colors = fs.readFileSync('src/assets/colors.json');
+		const palette = JSON.parse(colors);
+		let closestColor = palette[0].value;
+		let closestColorDifference;
+		for (let i = 0; i < palette.length; i++) {
+			let colorDifference = 0;
+			const paletteColor = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(palette[i].value);
+			colorDifference += Math.pow(r - parseInt(paletteColor[1], 16), 2);
+			colorDifference += Math.pow(g - parseInt(paletteColor[2], 16), 2);
+			colorDifference += Math.pow(b - parseInt(paletteColor[3], 16), 2);
+			colorDifference = Math.sqrt(colorDifference);
+			if (colorDifference <= closestColorDifference || closestColorDifference === undefined || closestColorDifference === null) {
+				closestColor = palette[i];
+				closestColorDifference = colorDifference;
+			}
+		}
+
+		await Jimp.loadFont(fnt).then(font => {
+			generated.print(font, 10, 10, closestColor.name);
+			(closestColor.value.toLowerCase() === color.toLowerCase()) ? generated.print(font, 10, 20, '(exact match)') : generated.print(font, 10, 20, '(inexact match)');
+			generated.print(font, 10, 40, color);
+			generated.print(font, 10, 60, `R: ${r}`);
+			generated.print(font, 10, 70, `G: ${g}`);
+			generated.print(font, 10, 80, `B: ${b}`);
+		});
+
+		return generated.getBufferAsync(Jimp.MIME_PNG);
 	},
 };

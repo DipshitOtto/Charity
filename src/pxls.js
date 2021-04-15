@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const WebSocketClient = require('websocket').client;
 const axios = require('axios');
 const Jimp = require('jimp');
@@ -15,6 +13,7 @@ module.exports = {
 
 		ws.on('connectFailed', function(error) {
 			console.log('Websocket Connecting Error: ' + error.toString());
+			setTimeout(function() { module.exports.init(); }, 5000);
 		});
 
 		ws.on('connect', async function(connection) {
@@ -22,6 +21,7 @@ module.exports = {
 
 			connection.on('error', function(error) {
 				console.log('Websocket Error: ' + error.toString());
+				setTimeout(function() { module.exports.init(); }, 5000);
 			});
 
 			try {
@@ -76,7 +76,7 @@ module.exports = {
 
 			connection.on('close', function() {
 				console.log('Websocket Closed');
-				module.exports.init();
+				setTimeout(function() { module.exports.init(); }, 5000);
 			});
 			connection.on('message', function(message) {
 				if (message.type === 'utf8') {

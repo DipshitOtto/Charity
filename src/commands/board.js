@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const canvas = require('../handlers/canvas');
 
 const Discord = require('discord.js');
