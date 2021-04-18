@@ -85,10 +85,10 @@ module.exports = {
 			if (command.description) data.push(`**Description:** ${command.description}`);
 
 			if(command.options.length) {
-				let usage = '**Usage:** ';
+				let usage = `**Usage:** \n\`/${command.name}`;
 				for (let i = 0; i < command.options.length; i++) {
 					if(command.options[i].type === 1) {
-						usage += `\n\`/${command.name} ${command.options[i].name}`;
+						usage += ` ${command.options[i].name}`;
 						for (let j = 0; j < command.options[i].options.length; j++) {
 							if(command.options[i].options[j].required) {
 								usage += ` <${command.options[i].options[j].name}>`;
@@ -96,13 +96,13 @@ module.exports = {
 								usage += ` [${command.options[i].options[j].name}]`;
 							}
 						}
-						usage += '`';
 					} else if(command.options[i].required) {
-						usage += `\`/${command.name} <${command.options[i].name}>\``;
+						usage += ` <${command.options[i].name}>`;
 					} else {
 						usage += `\`/${command.name} [${command.options[i].name}]\``;
 					}
 				}
+				usage += '`';
 				data.push(usage);
 			}
 
