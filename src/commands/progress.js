@@ -5,9 +5,9 @@ const database = require('../handlers/database');
 const canvas = require('../handlers/canvas');
 
 module.exports = {
-	name: 'progress',
+	name: 'check',
 	description: 'Check the progress of any template in the progress checker.',
-	aliases: ['check'],
+	// aliases: ['progress'],
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,

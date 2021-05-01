@@ -6,7 +6,7 @@ const Discord = require('discord.js');
 module.exports = {
 	name: 'help',
 	description: 'List all commands or get info about a specific command.',
-	aliases: ['commands'],
+	// aliases: ['commands'],
 	guildOnly: false,
 	permissions: '',
 	cooldown: 1,
