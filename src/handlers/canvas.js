@@ -271,4 +271,27 @@ module.exports = {
 
 		return generated.getBufferAsync(Jimp.MIME_PNG);
 	},
+	async layer(templates) {
+		const board = pxls.board();
+		const layered = await new Jimp(board.bitmap.width, board.bitmap.height);
+		let minX = board.bitmap.width;
+		let minY = board.bitmap.height;
+		let maxX = 0;
+		let maxY = 0;
+
+		for(let i = templates.length - 1; i >= 0; i--) {
+			const template = await Jimp.read(templates[i].image);
+			layered.composite(template, templates[i].ox, templates[i].oy);
+
+			const height = await module.exports.height(templates[i].image, await module.exports.scaleFactor(templates[i].image, templates[i].width));
+			if(templates[i].ox < minX) minX = templates[i].ox;
+			if(templates[i].oy < minY) minY = templates[i].oy;
+			if((templates[i].ox + templates[i].width) > maxX) maxX = templates[i].ox + templates[i].width;
+			if((templates[i].oy + height) > maxY) maxY = templates[i].oy + height;
+		}
+
+		layered.crop(minX, minY, maxX - minX, maxY - minY);
+
+		return layered.getBufferAsync(Jimp.MIME_PNG);
+	},
 };
