@@ -7,6 +7,7 @@ const canvas = require('../handlers/canvas');
 module.exports = {
 	name: 'reduce',
 	description: 'Reduce a template image to the current Pxls palette.',
+	aliases: [],
 	// aliases: ['fiddle'],
 	guildOnly: false,
 	permissions: '',

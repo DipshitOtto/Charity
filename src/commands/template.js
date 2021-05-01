@@ -8,6 +8,7 @@ const canvas = require('../handlers/canvas');
 module.exports = {
 	name: 'template',
 	description: 'View/Add/Edit/Remove a template in the progress checker.',
+	aliases: [],
 	// aliases: ['project', 'temp'],
 	guildOnly: true,
 	permissions: '',

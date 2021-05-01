@@ -5,6 +5,7 @@ const Discord = require('discord.js');
 module.exports = {
 	name: 'board',
 	description: 'Gets the current state of the canvas.',
+	aliases: [],
 	// aliases: ['canvas'],
 	guildOnly: true,
 	permissions: '',

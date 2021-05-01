@@ -6,6 +6,7 @@ const canvas = require('../handlers/canvas');
 module.exports = {
 	name: 'detemplatize',
 	description: 'Get the original 1:1 image from a template link.',
+	aliases: [],
 	// aliases: ['detemp'],
 	guildOnly: false,
 	permissions: '',
