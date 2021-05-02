@@ -120,4 +120,33 @@ module.exports = {
 	board() {
 		return board;
 	},
+	async users() {
+		let users = await axios.get(`${process.env.PXLS_URL}users`, { responseType: 'json' });
+		users = users.data.count;
+		return users;
+	},
+	async cooldown(users) {
+		const cooldown = 2.5 * Math.sqrt(users + 11.96) + 6.5;
+
+		function format(cd) {
+			const hours = Math.floor(cd / 3600);
+			let minutes = Math.floor((cd - (hours * 3600)) / 60);
+			let seconds = (cd - (hours * 3600) - (minutes * 60)).toFixed(2);
+
+			if (minutes < 10) {minutes = '0' + minutes;}
+			if (seconds < 10) {seconds = '0' + seconds;}
+			return minutes + ':' + seconds;
+		}
+
+		const cooldowns = [
+			[cooldown, format(cooldown.toFixed(2))],
+			[cooldown * 6, format((cooldown * 6).toFixed(2))],
+			[cooldown * 9, format((cooldown * 9).toFixed(2))],
+			[cooldown * 15, format((cooldown * 15).toFixed(2))],
+			[cooldown * 24, format((cooldown * 24).toFixed(2))],
+			[cooldown * 36, format((cooldown * 36).toFixed(2))],
+		];
+
+		return cooldowns;
+	},
 };
