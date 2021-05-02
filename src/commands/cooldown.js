@@ -25,6 +25,16 @@ module.exports = {
 		const users = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'users').value : await pxls.users();
 		const cooldown = await pxls.cooldown(users);
 
+		if(users > 1386) {
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setDescription(':x: Users cannot exceed 1386!');
+
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
+		}
+
 		let response = '';
 
 		for(let i = 0; i < cooldown.length; i++) {
