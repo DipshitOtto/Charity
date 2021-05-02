@@ -8,7 +8,7 @@ module.exports = {
 	aliases: [],
 	guildOnly: false,
 	permissions: '',
-	cooldown: 3,
+	cooldown: 5,
 	options: [
 		{
 			'type': 3,

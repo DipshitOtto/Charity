@@ -34,13 +34,30 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 	if (!command) return;
 
 	if (command.guildOnly && !guild) {
-		new Discord.WebhookClient(client.user.id, interaction.token).send('I can\'t execute that command inside DMs!');
+		const embed = new Discord.MessageEmbed()
+			.setColor(process.env.BOT_COLOR)
+			.setDescription(':x: I can\'t execute that command inside DMs!');
+
+		return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+			type: 4,
+			data: {
+				embeds: [embed.toJSON()],
+			},
+		} });
 	}
 
 	if (command.permissions && interaction.member.permissions) {
 		const authorPerms = channel.permissionsFor(user);
 		if (!authorPerms || !authorPerms.has(command.permissions)) {
-			return new Discord.WebhookClient(client.user.id, interaction.token).send(':x: You can not do this!');
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setDescription(':x: You can not do this!');
+			return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+				type: 4,
+				data: {
+					embeds: [embed.toJSON()],
+				},
+			} });
 		}
 	}
 
@@ -57,7 +74,15 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
-			return new Discord.WebhookClient(client.user.id, interaction.token).send(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${process.env.BOT_PREFIX}${command.name}\` command.`);
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setDescription(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`/${command.name}\` command.`);
+			return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+				type: 4,
+				data: {
+					embeds: [embed.toJSON()],
+				},
+			} });
 		}
 	} else {
 		timestamps.set(user.id, now);
@@ -68,7 +93,15 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 		command.execute(interaction, client);
 	} catch (error) {
 		console.error(error);
-		new Discord.WebhookClient(client.user.id, interaction.token).send(':x: There was an error trying to execute that command!');
+		const embed = new Discord.MessageEmbed()
+			.setColor(process.env.BOT_COLOR)
+			.setDescription(':x: There was an error trying to execute that command!');
+		return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
+			type: 4,
+			data: {
+				embeds: [embed.toJSON()],
+			},
+		} });
 	}
 });
 

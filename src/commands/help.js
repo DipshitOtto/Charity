@@ -37,18 +37,23 @@ module.exports = {
 				for(const command of commands) {
 					let usage = '';
 					for (let i = 0; i < command[1].options.length; i++) {
-						if(command[1].options[i].type === 1) {
-							if(i === 0) {
-								usage += ` {${command[1].options[i].name}`;
-							} else if (i === command[1].options.length - 1) {
-								usage += `|${command[1].options[i].name}}`;
+						if(i < 2) {
+							if(command[1].options[i].type === 1 || command[1].options[i].type === 2) {
+								if(i === 0) {
+									usage += ` {${command[1].options[i].name}`;
+								} else if (i === command[1].options.length - 1) {
+									usage += `|${command[1].options[i].name}}`;
+								} else {
+									usage += `|${command[1].options[i].name}`;
+								}
+							} else if(command[1].options[i].required) {
+								usage += ` <${command[1].options[i].name}>`;
 							} else {
-								usage += `|${command[1].options[i].name}`;
+								usage += ` [${command[1].options[i].name}]`;
 							}
-						} else if(command[1].options[i].required) {
-							usage += ` <${command[1].options[i].name}>`;
 						} else {
-							usage += ` [${command[1].options[i].name}]`;
+							usage += '...';
+							break;
 						}
 					}
 					data.push(`• \`/${command[1].name}${usage}\` - ${command[1].description}`);
@@ -74,9 +79,14 @@ module.exports = {
 			const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
 			if (!command) {
+				const error = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setDescription(':x: That\'s not a valid command!');
 				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
 					type: 4,
-					data: ':x: That\'s not a valid command!',
+					data: {
+						embeds: [error.toJSON()],
+					},
 				} });
 			}
 
@@ -95,6 +105,18 @@ module.exports = {
 								usage += ` <${command.options[i].options[j].name}>`;
 							} else {
 								usage += ` [${command.options[i].options[j].name}]`;
+							}
+						}
+					} else if(command.options[i].type === 2) {
+						for (let j = 0; j < command.options[i].options.length; j++) {
+							(j === 0) ? usage += ` ${command.options[i].name}` : usage += `\`\n\`/${command.name} ${command.options[i].name}`;
+							usage += ` ${command.options[i].options[j].name}`;
+							for (let k = 0; k < command.options[i].options[j].options.length; k++) {
+								if(command.options[i].options[j].options[k].required) {
+									usage += ` <${command.options[i].options[j].options[k].name}>`;
+								} else {
+									usage += ` [${command.options[i].options[j].options[k].name}]`;
+								}
 							}
 						}
 					} else if(command.options[i].required) {
