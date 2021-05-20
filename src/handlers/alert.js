@@ -23,11 +23,13 @@ module.exports = {
 				.setTitle(':warning: Grief Alert!')
 				.setDescription(`Roughly **${users}** user(s) worth of force has been detected on ${template.title}!\n**[Template Link](${template.reference})**`);
 			client.channels.cache.get(template.alertChannel).send(embed);
-			if(!hasPinged[id] || hasPinged[id] < Date.now() - 30 * 60 * 1000) {
-				if(!lastUsers[id] || lastUsers[id] < template.alertThreshold) {
-					if(template.griefedPixels >= template.alertThreshold) {
-						client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
-						hasPinged[id] = Date.now();
+			if(template.alertThreshold && template.alertRole) {
+				if(!hasPinged[id] || hasPinged[id] < Date.now() - 30 * 60 * 1000) {
+					if(!lastUsers[id] || lastUsers[id] < template.alertThreshold) {
+						if(template.griefedPixels >= template.alertThreshold) {
+							client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
+							hasPinged[id] = Date.now();
+						}
 					}
 				}
 			}
