@@ -10,16 +10,16 @@ module.exports = {
 	permissions: '',
 	cooldown: 3,
 	options: [],
-	execute(interaction, client) {
+	async execute(interaction, client) {
 		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
 		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
 
-		const users = pxls.users();
+		const users = await pxls.users();
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Users!')
-			.setDescription(`There are ${users} user(s) on Pxls right now.`);
+			.setDescription(`There are ${users} user(s) on the site right now.`);
 
 		webhook.editMessage('@original', {
 			embeds: [embed.toJSON()],
