@@ -1,6 +1,6 @@
-const canvas = require('../handlers/canvas');
-
 const Discord = require('discord.js');
+
+const pxls = require('../pxls');
 
 module.exports = {
 	name: 'users',
@@ -10,23 +10,19 @@ module.exports = {
 	permissions: '',
 	cooldown: 3,
 	options: [],
-	async execute(interaction, client) {
+	execute(interaction, client) {
 		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
 		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
 
-		const board = await canvas.board();
+		const users = pxls.users();
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
-			.setTitle('Board!')
-			.setImage('attachment://file.jpg');
+			.setTitle('Users!')
+			.setDescription(`There are ${users} user(s) on Pxls right now.`);
 
 		webhook.editMessage('@original', {
 			embeds: [embed.toJSON()],
-			files: [{
-				attachment: board,
-				name: 'file.jpg',
-			}],
 		});
 	},
 };

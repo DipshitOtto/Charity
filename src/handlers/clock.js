@@ -1,7 +1,7 @@
 const pxls = require('../pxls');
 const alert = require('./alert');
 
-const delay = 1;
+const delay = 5;
 
 module.exports = {
 	init(client) {
