@@ -23,7 +23,17 @@ module.exports = {
 		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
 
 		const users = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'users').value : await pxls.users();
-		const cooldown = await pxls.cooldown(users);
+		const cooldown = pxls.cooldown(users);
+
+		function format(cd) {
+			const hours = Math.floor(cd / 3600);
+			let minutes = Math.floor((cd - (hours * 3600)) / 60);
+			let seconds = (cd - (hours * 3600) - (minutes * 60)).toFixed(2);
+
+			if (minutes < 10) {minutes = '0' + minutes;}
+			if (seconds < 10) {seconds = '0' + seconds;}
+			return minutes + ':' + seconds;
+		}
 
 		if(users > 1386) {
 			const embed = new Discord.MessageEmbed()
@@ -37,8 +47,8 @@ module.exports = {
 
 		let response = '';
 
-		for(let i = 0; i < cooldown.length; i++) {
-			response += `${i}/${cooldown.length} -> ${i + 1}/${cooldown.length} = ${cooldown[i][1]}\n`;
+		for(let i = 0; i < 6; i++) {
+			response += `${i}/6 -> ${i + 1}/6 = ${format(pxls.cooldownMultiplier(cooldown, i))}\n`;
 		}
 
 		const embed = new Discord.MessageEmbed()

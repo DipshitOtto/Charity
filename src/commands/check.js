@@ -47,7 +47,7 @@ module.exports = {
 
 		const subcommand = interaction.data.options[0];
 		if (subcommand.name === 'list') {
-			const templates = await database.listTemplates(interaction.guild_id, pxls.info().canvasCode);
+			const templates = await database.listTemplates({ gid: interaction.guild_id, canvasCode: pxls.info().canvasCode });
 
 			const results = [];
 
@@ -69,7 +69,11 @@ module.exports = {
 			const name = (subcommand.options && subcommand.options.find(option => option.name == 'name')) ? subcommand.options.find(option => option.name == 'name').value : null;
 			const diff = (subcommand.options && subcommand.options.find(option => option.name == 'diff')) ? subcommand.options.find(option => option.name == 'diff').value : true;
 
-			const template = await database.getTemplate(name, interaction.guild_id, pxls.info().canvasCode);
+			const template = await database.getTemplate({
+				name: name,
+				gid: interaction.guild_id,
+				canvasCode: pxls.info().canvasCode,
+			});
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)

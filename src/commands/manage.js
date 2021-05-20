@@ -129,7 +129,61 @@ module.exports = {
 			'type': 2,
 			'name': 'alert',
 			'description': 'Manage grief alert for a template in the template progress checker.',
-			'options': [],
+			'options': [
+				{
+					'type': 1,
+					'name': 'add',
+					'description': 'Add grief alert for a template to a specified channel.',
+					'options': [
+						{
+							'type': 3,
+							'name': 'name',
+							'description': 'The name of the template to alert griefs for.',
+							'default': false,
+							'required': true,
+						},
+						{
+							'type': 7,
+							'name': 'channel',
+							'description': 'The channel grief alerts should be sent to.',
+							'default': false,
+							'required': true,
+						},
+						{
+							'type': 4,
+							'name': 'threshold',
+							'description': 'The amount of griefers required for grief alert to trigger a ping for this template.',
+							'required': false,
+						},
+						{
+							'type': 9,
+							'name': 'role',
+							'description': 'The role to ping when the threshold is hit.',
+							'required': false,
+						},
+					],
+				},
+				{
+					'type': 1,
+					'name': 'remove',
+					'description': 'Remove grief alert for a template.',
+					'options': [
+						{
+							'type': 3,
+							'name': 'name',
+							'description': 'The name of the template to remove grief alert for.',
+							'default': false,
+							'required': true,
+						},
+					],
+				},
+				{
+					'type': 1,
+					'name': 'list',
+					'description': 'List the templates with grief alert.',
+					'options': [],
+				},
+			],
 		},
 	],
 	async template(interaction, webhook) {
@@ -139,11 +193,14 @@ module.exports = {
 		if (command === 'view') {
 			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
 
-			const template = await database.getTemplate(name, interaction.guild_id);
+			const template = await database.getTemplate({
+				name: name,
+				gid: interaction.guild_id,
+			});
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/template add ${name} <template url>\`!`);
+					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name} <template url>\`!`);
 
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
@@ -185,6 +242,10 @@ module.exports = {
 					oy: parseInt(decodeURIComponent(link.match(/(?<=[#&?]oy=)(.*?)(?=&|$)/g))),
 					width: parseInt(decodeURIComponent(link.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
 					reference: link,
+					alert: false,
+					alertChannel: null,
+					alertThreshold: null,
+					alertRole: null,
 				};
 
 				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
@@ -195,7 +256,10 @@ module.exports = {
 
 				await database.addTemplate(name, interaction.guild_id, data);
 
-				const template = await database.getTemplate(name, interaction.guild_id);
+				const template = await database.getTemplate({
+					name: name,
+					gid: interaction.guild_id,
+				});
 
 				if (template === null) {
 					const embed = new Discord.MessageEmbed()
@@ -228,7 +292,7 @@ module.exports = {
 			} else {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(':x: You must provide a valid template link!\nThe proper usage would be: `/template add <template name> <template url>`');
+					.setDescription(':x: You must provide a valid template link!\nThe proper usage would be: `/manage template add <template name> <template url>`');
 
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
@@ -310,7 +374,7 @@ module.exports = {
 			} else {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Key \`${key}\` does not exist!\nUse \`/template view ${name}\` to see arguments.`);
+					.setDescription(`:x: Key \`${key}\` does not exist!\nUse \`/manage template view ${name}\` to see arguments.`);
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
 				});
@@ -318,12 +382,12 @@ module.exports = {
 
 			await database.editTemplate(name, interaction.guild_id, data);
 
-			const template = (key === 'name') ? await database.getTemplate(value.trim().split(/ +/).shift(), interaction.guild_id) : await database.getTemplate(name, interaction.guild_id);
+			const template = (key === 'name') ? await database.getTemplate({ name: value.trim().split(/ +/).shift(), gid: interaction.guild_id }) : await database.getTemplate({ name: name, gid: interaction.guild_id });
 
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/template add ${name} <template url>\`!`);
+					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name} <template url>\`!`);
 
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
@@ -393,12 +457,15 @@ module.exports = {
 
 				await database.editTemplate(name, interaction.guild_id, data);
 
-				const template = await database.getTemplate(name, interaction.guild_id);
+				const template = await database.getTemplate({
+					name: name,
+					gid: interaction.guild_id,
+				});
 
 				if (template == null) {
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
-						.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/template add ${name} <template url>\`!`);
+						.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name} <template url>\`!`);
 
 					return webhook.editMessage('@original', {
 						embeds: [embed.toJSON()],
@@ -425,7 +492,7 @@ module.exports = {
 				}
 			}
 		} else if (command === 'list') {
-			const templates = await database.listTemplates(interaction.guild_id);
+			const templates = await database.listTemplates({ gid: interaction.guild_id });
 
 			const results = [];
 
@@ -434,6 +501,114 @@ module.exports = {
 			});
 
 			if (results.length === 0) results.push('There are no templates in this progress checker!');
+
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setTitle('Templates:')
+				.setDescription(results.join('\n'));
+
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
+		}
+	},
+	async alert(interaction, webhook) {
+		const command = interaction.options[0].name;
+		const args = interaction.options[0].options;
+
+		if (command === 'add') {
+			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
+			const channel = (args.find(option => option.name == 'channel')) ? args.find(option => option.name == 'channel').value : null;
+			const threshold = (args.find(option => option.name == 'threshold')) ? args.find(option => option.name == 'threshold').value : null;
+			const role = (args.find(option => option.name == 'role')) ? args.find(option => option.name == 'role').value : null;
+
+			const template = await database.getTemplate({
+				name: name,
+				gid: interaction.guild_id,
+				canvasCode: pxls.info().canvasCode,
+			});
+			if(!template) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(`:x: Template ${name} doesn't exist! You can create it with \`/manage template add ${name} <template url>\`!`);
+				return webhook.editMessage('@original', {
+					embeds: [embed.toJSON()],
+				});
+			}
+
+			if(threshold && !role) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(':x: You must provide a role to ping when this template meets the threshold!');
+				return webhook.editMessage('@original', {
+					embeds: [embed.toJSON()],
+				});
+			} else if (!threshold && role) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(':x: You must provide a threshold to meet to ping the role!');
+				return webhook.editMessage('@original', {
+					embeds: [embed.toJSON()],
+				});
+			}
+
+			await database.editTemplate(name, interaction.guild_id, {
+				alert: true,
+				alertChannel: channel,
+				alertThreshold: (threshold) ? threshold : null,
+				alertRole: (role) ? role : null,
+			});
+
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setTitle('Templates:')
+				.setDescription(`:white_check_mark: Added grief alert to ${name}!`);
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
+		} else if (command === 'remove') {
+			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
+
+			const template = await database.getTemplate({
+				name: name,
+				gid: interaction.guild_id,
+				canvasCode: pxls.info().canvasCode,
+			});
+			if(!template) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(`:x: Template ${name} doesn't exist! You can create it with \`/manage template add ${name} <template url>\`!`);
+				return webhook.editMessage('@original', {
+					embeds: [embed.toJSON()],
+				});
+			}
+
+			await database.editTemplate(name, interaction.guild_id, { alert: false });
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setTitle('Templates:')
+				.setDescription(`:white_check_mark: Removed grief alert from ${name}!`);
+			return webhook.editMessage('@original', {
+				embeds: [embed.toJSON()],
+			});
+		} else if (command === 'list') {
+			const templates = await database.listTemplates({
+				gid: interaction.guild_id,
+				canvasCode: pxls.info().canvasCode,
+				alert: true,
+			});
+
+			const results = [];
+
+			await templates.forEach(result => {
+				results.push(`\`${result.name}\` - ${result.title}`);
+			});
+
+			if (results.length === 0) results.push('There are no templates with grief alert!');
 
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
@@ -454,9 +629,11 @@ module.exports = {
 
 		if (userID === process.env.BOT_OWNER || (permissions & 0x20) == 0x20) {
 			const subcommand = interaction.data.options[0];
+			subcommand.guild_id = interaction.guild_id;
 			if(subcommand.name === 'template') {
-				subcommand.guild_id = interaction.guild_id;
 				module.exports.template(subcommand, webhook);
+			} else if(subcommand.name === 'alert') {
+				module.exports.alert(subcommand, webhook);
 			}
 		} else {
 			const embed = new Discord.MessageEmbed()

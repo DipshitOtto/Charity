@@ -3,7 +3,8 @@ require('dotenv').config();
 const fs = require('fs');
 const Discord = require('discord.js');
 
-const pxls = require('./src/pxls');
+const websocket = require('./src/handlers/websocket');
+const clock = require('./src/handlers/clock');
 
 const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
 client.commands = new Discord.Collection();
@@ -20,7 +21,8 @@ for (const file of commandFiles) {
 client.once('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity('pxls.space', { type: 'WATCHING' });
-	pxls.init();
+	websocket.connect();
+	clock.init(client);
 });
 
 client.ws.on('INTERACTION_CREATE', async interaction => {

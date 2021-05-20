@@ -209,7 +209,11 @@ module.exports = {
 					width: parseInt(decodeURIComponent(options[i].value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
 				});
 			} else {
-				const template = await database.getTemplate(options[i].value, interaction.guild_id, pxls.info().canvasCode);
+				const template = await database.getTemplate({
+					name: options[i].value,
+					gid: interaction.guild_id,
+					canvasCode:pxls.info().canvasCode,
+				});
 				if(template && template.source) {
 					const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
 					templates.push({

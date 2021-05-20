@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 
 module.exports = {
-	async getTemplate(name, gid, canvasCode) {
+	async getTemplate(data) {
 		const mongo = new MongoClient(process.env.DB_CONNECTION, {
 			useUnifiedTopology: true,
 		});
@@ -9,15 +9,6 @@ module.exports = {
 			await mongo.connect();
 			const database = mongo.db('charity');
 			const templates = database.collection('templates');
-
-			const data = {
-				name: name,
-				gid: gid,
-			};
-
-			if (canvasCode != undefined || canvasCode != null) {
-				data.canvasCode = canvasCode;
-			}
 
 			const result = await templates.findOne(data);
 
@@ -96,7 +87,7 @@ module.exports = {
 			await mongo.close();
 		}
 	},
-	async listTemplates(gid, canvasCode) {
+	async listTemplates(data) {
 		const mongo = new MongoClient(process.env.DB_CONNECTION, {
 			useUnifiedTopology: true,
 		});
@@ -107,13 +98,6 @@ module.exports = {
 
 			const results = [];
 
-			const data = {
-				gid: gid,
-			};
-
-			if (canvasCode != undefined || canvasCode != null) {
-				data.canvasCode = canvasCode;
-			}
 
 			const find = await templates.find(data);
 
