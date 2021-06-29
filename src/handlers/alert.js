@@ -1,40 +1,37 @@
 const Discord = require('discord.js');
+var ObjectId = require('mongodb').ObjectId;
 
 const pxls = require('../pxls');
 const database = require('./database');
 
-let griefedPixels = {};
-const hasPinged = {};
-const lastUsers = {};
+let griefCounter = {};
+let lastAttackDate = {};
 
 module.exports = {
-	check(client, delay) {
-		const templates = Object.keys(griefedPixels);
-		templates.forEach(async id => {
-			const template = griefedPixels[id];
-			griefedPixels = {};
-
-			let users = Math.round(template.griefedPixels / ((60 * delay) / pxls.cooldown(await pxls.users())));
-
-			if(users === 0) users = 1;
-
-			const embed = new Discord.MessageEmbed()
-				.setColor(process.env.BOT_COLOR)
-				.setTitle(':warning: Grief Alert!')
-				.setDescription(`Roughly **${users}** user(s) worth of force has been detected on ${template.title}!\n**[Template Link](${template.reference})**`);
-			client.channels.cache.get(template.alertChannel).send(embed);
-			if(template.alertThreshold && template.alertRole) {
-				if(!hasPinged[id] || hasPinged[id] < Date.now() - 30 * 60 * 1000) {
-					if(!lastUsers[id] || lastUsers[id] < template.alertThreshold) {
-						if(template.griefedPixels >= template.alertThreshold) {
-							client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
-							hasPinged[id] = Date.now();
-						}
-					}
-				}
-			}
-			lastUsers[id] = users;
-		});
+  async check(client, delay) {
+		for (var id in griefCounter) {
+			const template = await database.getTemplate({_id: ObjectId(id)})
+      let users = Math.round(griefCounter[id] / ((60 * delay) / pxls.cooldown(await pxls.users())));
+      if(users === 0) users = 1;
+      // In case the case of a detected attack, we:
+      // Send an embed if there were no attacks in the past 10 minutes
+      // Ping the alert role if there were no attacks were detected in the past 30 minutes
+      if(users >= template.alertThreshold) {
+        if (!lastAttackDate[id] || Date.now() - lastAttackDate[id] > 10 * 60 * 1000) {
+          // Send embed
+          const embed = new Discord.MessageEmbed()
+            .setColor(process.env.BOT_COLOR)
+            .setTitle(':warning: Grief Alert!')
+            .setDescription(`Roughly **${users}** user(s) worth of force has been detected on ${template.title}!\n**[Template Link](${template.reference})**`);
+          client.channels.cache.get(template.alertChannel).send(embed);
+          if (template.alertRole && (!lastAttackDate[id] || Date.now()  - lastAttackDate[id] > 30 * 60 * 1000)) {
+              // Ping
+              client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
+            }
+          }
+        }
+        lastAttackDate[id] = Date.now();
+      };
 	},
 	async checkPixel(data) {
 		for(let i = 0; i < data.pixels.length; i++) {
@@ -46,15 +43,14 @@ module.exports = {
 				canvasCode: pxls.info().canvasCode,
 				alert: true,
 			});
-			await templates.forEach(template => {
+			templates.forEach(template => {
 				if(x >= template.ox && x < (template.ox + template.width) && y >= template.oy && y < (template.oy + template.height)) {
 					const idx = template.width * (y - template.oy) + (x - template.ox);
-					if(template.source[idx] != color && color != 255) {
-						if(!griefedPixels[template._id]) {
-							griefedPixels[template._id] = template;
-							griefedPixels[template._id].griefedPixels = 0;
+					if(template.source[idx] != color && template.source[idx] != 255 && color != 255) {
+						if(!griefCounter[template._id]) {
+							griefCounter[template._id] = 0;
 						}
-						griefedPixels[template._id].griefedPixels = griefedPixels[template._id].griefedPixels + 1;
+						griefCounter[template._id] = griefCounter[template._id] + 1;
 					}
 				}
 			});
