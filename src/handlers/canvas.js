@@ -271,6 +271,24 @@ module.exports = {
 
 		return generated.getBufferAsync(Jimp.MIME_PNG);
 	},
+	async cropToBoard(template, x, y) {
+		const board = pxls.board();
+		// crop top-left
+		const minX = x >= 0 ? 0 : -x;
+		const minY = y >= 0 ? 0 : -y;
+		template.crop(minX, minY, template.bitmap.width - minX, template.bitmap.height - minY)
+		x = Math.max(0, x);
+		y = Math.max(0, y);
+		// crop bottom-right
+		const height = y + template.bitmap.height > board.bitmap.height ? board.bitmap.height - y : template.bitmap.height;
+		const width = x + template.bitmap.width > board.bitmap.width ? board.bitmap.width - x : template.bitmap.width;
+		template.crop(0, 0, width, height);
+		return {
+			image: template,
+			ox: x,
+			oy: y,
+		};
+	},
 	async layer(templates) {
 		const board = pxls.board();
 		const layered = await new Jimp(board.bitmap.width, board.bitmap.height);
@@ -280,14 +298,14 @@ module.exports = {
 		let maxY = 0;
 
 		for(let i = templates.length - 1; i >= 0; i--) {
-			const template = await Jimp.read(templates[i].image);
-			layered.composite(template, templates[i].ox, templates[i].oy);
-
-			const height = await module.exports.height(templates[i].image, await module.exports.scaleFactor(templates[i].image, templates[i].width));
-			if(templates[i].ox < minX) minX = templates[i].ox;
-			if(templates[i].oy < minY) minY = templates[i].oy;
-			if((templates[i].ox + templates[i].width) > maxX) maxX = templates[i].ox + templates[i].width;
-			if((templates[i].oy + height) > maxY) maxY = templates[i].oy + height;
+			const croppedTemplate = await this.cropToBoard(await Jimp.read(templates[i].image), templates[i].ox, templates[i].oy);
+			layered.composite(croppedTemplate.image, croppedTemplate.ox, croppedTemplate.oy);
+			const height = croppedTemplate.image.bitmap.height;
+			const width = croppedTemplate.image.bitmap.width;
+			if(croppedTemplate.ox < minX) minX = croppedTemplate.ox;
+			if(croppedTemplate.oy < minY) minY = croppedTemplate.oy;
+			if((croppedTemplate.ox + width) > maxX) maxX = croppedTemplate.ox + width;
+			if((croppedTemplate.oy + height) > maxY) maxY = croppedTemplate.oy + height;
 		}
 
 		layered.crop(minX, minY, maxX - minX, maxY - minY);
