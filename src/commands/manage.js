@@ -519,7 +519,7 @@ module.exports = {
 		if (command === 'add') {
 			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
 			const channel = (args.find(option => option.name == 'channel')) ? args.find(option => option.name == 'channel').value : null;
-			const threshold = (args.find(option => option.name == 'threshold')) ? args.find(option => option.name == 'threshold').value : null;
+			const threshold = (args.find(option => option.name == 'threshold')) ? args.find(option => option.name == 'threshold').value : 1;
 			const role = (args.find(option => option.name == 'role')) ? args.find(option => option.name == 'role').value : null;
 
 			const template = await database.getTemplate({
@@ -532,24 +532,6 @@ module.exports = {
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:')
 					.setDescription(`:x: Template ${name} doesn't exist! You can create it with \`/manage template add ${name} <template url>\`!`);
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
-			}
-
-			if(threshold && !role) {
-				const embed = new Discord.MessageEmbed()
-					.setColor(process.env.BOT_COLOR)
-					.setTitle('Templates:')
-					.setDescription(':x: You must provide a role to ping when this template meets the threshold!');
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
-			} else if (!threshold && role) {
-				const embed = new Discord.MessageEmbed()
-					.setColor(process.env.BOT_COLOR)
-					.setTitle('Templates:')
-					.setDescription(':x: You must provide a threshold to meet to ping the role!');
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
 				});
