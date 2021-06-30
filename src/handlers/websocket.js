@@ -5,7 +5,7 @@ const WebSocketClient = require('websocket').client;
 const ws = new WebSocketClient();
 
 module.exports = {
-	connect() {
+	connect(client) {
 		ws.on('connectFailed', function(error) {
 			console.log('Websocket Connecting Error: ' + error.toString());
 			setTimeout(function() { this.connect(); }, 5000);
@@ -30,7 +30,7 @@ module.exports = {
 					try {
 						if(data.type === 'pixel') {
 							pxls.updateBoard(data);
-							alert.checkPixel(data);
+							alert.checkPixel(data, client);
 						}
 					} catch (error) {
 						if(data.type === 'pixel') {

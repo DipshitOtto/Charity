@@ -14,40 +14,50 @@ module.exports = {
 	cooldown: 10,
 	options: [
 		{
-			'type': 1,
-			'name': 'list',
-			'description': 'List the templates in the progress checker.',
-			'options': [],
+			name: 'list',
+			type: 'SUB_COMMAND',
+			description: 'List the templates in the progress checker.',
 		},
 		{
-			'type': 1,
-			'name': 'progress',
-			'description': 'Check the progress of any template in the progress checker.',
-			'options': [
+			name: 'progress',
+			type: 'SUB_COMMAND',
+			description: 'Check the progress of any template in the progress checker.',
+			options: [
 				{
-					'type': 3,
-					'name': 'name',
-					'description': 'The name of the template you want to check the progress of.',
-					'default': false,
-					'required': true,
+					name: 'name',
+					type: 'STRING',
+					description: 'The name of the template you want to check the progress of.',
+					required: true,
 				},
 				{
-					'type': 5,
-					'name': 'diff',
-					'description': 'Whether to display the template as a diff image or a snapshot of it on the board. Defaults to true.',
-					'default': false,
-					'required': false,
+					name: 'display',
+					type: 'STRING',
+					description: 'How to display the template. Can be "difference", "actual", or "template". Defaults to "difference".',
+					required: false,
+					choices: [
+						{
+							name: 'difference',
+							value: 'difference',
+						},
+						{
+							name: 'actual',
+							value: 'actual',
+						},
+						{
+							name: 'template',
+							value: 'template',
+						},
+					],
 				},
 			],
 		},
 	],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
-		const subcommand = interaction.data.options[0];
+		const subcommand = interaction.options.values().next().value;
 		if (subcommand.name === 'list') {
-			const templates = await database.listTemplates({ gid: interaction.guild_id, canvasCode: pxls.info().canvasCode });
+			const templates = await database.listTemplates({ gid: interaction.guildID, canvasCode: pxls.info().canvasCode });
 
 			const results = [];
 
@@ -62,29 +72,23 @@ module.exports = {
 				.setTitle('Templates:')
 				.setDescription(results.join('\n'));
 
-			webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		} else if (subcommand.name === 'progress') {
-			const name = (subcommand.options && subcommand.options.find(option => option.name == 'name')) ? subcommand.options.find(option => option.name == 'name').value : null;
-			const diff = (subcommand.options && subcommand.options.find(option => option.name == 'diff')) ? subcommand.options.find(option => option.name == 'diff').value : true;
+			const name = subcommand.options.get('name');
+			const display = subcommand.options.get('display');
 
 			const template = await database.getTemplate({
-				name: name,
-				gid: interaction.guild_id,
+				name: name.value,
+				gid: interaction.guildID,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can list templates with \`/progress list\`!`);
+					.setDescription(`:x: Template \`${name.value}\` does not exist!\nYou can list templates with \`/progress list\`!`);
 
-				webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			} else {
-
-
 				const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
 				const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
 
@@ -92,10 +96,12 @@ module.exports = {
 
 				let result;
 
-				if (diff) {
-					result = diffImage.generated;
-				} else {
+				if (display && display.value === 'template') {
+					result = templateSource;
+				} else if (display && display.value === 'actual') {
 					result = actual;
+				} else {
+					result = diffImage.generated;
 				}
 
 				const embed = new Discord.MessageEmbed()
@@ -103,13 +109,13 @@ module.exports = {
 					.setTitle(template.title)
 					.setDescription(`Total Pixels: ${diffImage.totalPixels.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\nCorrect Pixels: ${diffImage.correctPixels.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\nPixels To Go: ${diffImage.toGoPixels.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}\nPercentage Complete: ${diffImage.percentageComplete + '%'}`)
 					.setURL(template.reference)
-					.setImage('attachment://file.jpg');
+					.setImage('attachment://progress.png');
 
-				webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
+				await interaction.editReply({
+					embeds: [embed],
 					files: [{
 						attachment: result,
-						name: 'file.jpg',
+						name: 'progress.png',
 					}],
 				});
 			}

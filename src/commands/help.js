@@ -13,32 +13,39 @@ module.exports = {
 	cooldown: 1,
 	options: [
 		{
-			'type': 3,
-			'name': 'command',
-			'description': 'The command to get info about.',
-			'default': false,
-			'required': false,
+			name: 'command',
+			type: 'STRING',
+			description: 'The command to get info about.',
+			required: false,
 		},
 	],
 	execute(interaction, client) {
-		const argument = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'command').value : null;
+		const argument = interaction.options.get('command');
 
-		fs.readFile('./src/assets/profile.png', function(err, buffer) {
+		fs.readFile('./src/assets/profile.png', async function(err, buffer) {
 			if (err) throw err;
 			const data = [];
 			const { commands } = client;
 
+			const row = new Discord.MessageActionRow()
+				.addComponents(
+					new Discord.MessageButton()
+						.setURL(process.env.DISCORD_URL)
+						.setLabel('Join the Discord!')
+						.setStyle('LINK'),
+				);
+
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Help:')
-				.setThumbnail('attachment://file.jpg');
+				.setThumbnail('attachment://profile.png');
 
 			if (!argument) {
 				for(const command of commands) {
 					let usage = '';
 					for (let i = 0; i < command[1].options.length; i++) {
 						if(i < 2) {
-							if(command[1].options[i].type === 1 || command[1].options[i].type === 2) {
+							if(command[1].options[i].type === 'SUB_COMMAND' || command[1].options[i].type === 'SUB_COMMAND_GROUP') {
 								if(i === 0) {
 									usage += ` {${command[1].options[i].name}`;
 								} else if (i === command[1].options.length - 1) {
@@ -63,31 +70,23 @@ module.exports = {
 				embed.setDescription(data.join('\n'));
 				embed.setFooter('<> is a required argument. [] is an optional argument. {} is a set of required items, you must choose one.');
 
-				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
-					type: 4,
-					data: {
-						embeds: [embed.toJSON()],
-						files: [{
-							attachment: buffer,
-							name: 'file.jpg',
-						}],
-					},
-				} });
+				return await interaction.reply({
+					embeds: [embed],
+					files: [{
+						attachment: buffer,
+						name: 'profile.png',
+					}],
+					components: [row],
+				});
 			}
 
-			const name = argument.toLowerCase();
-			const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+			const command = commands.get(argument.value) || commands.find(c => c.aliases && c.aliases.includes(argument.value));
 
 			if (!command) {
 				const error = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setDescription(':x: That\'s not a valid command!');
-				return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
-					type: 4,
-					data: {
-						embeds: [error.toJSON()],
-					},
-				} });
+				return await interaction.reply({ embeds: [error] });
 			}
 
 			data.push(`\`/${command.name}\``);
@@ -98,7 +97,7 @@ module.exports = {
 			if(command.options.length) {
 				let usage = `**Usage:** \n\`/${command.name}`;
 				for (let i = 0; i < command.options.length; i++) {
-					if(command.options[i].type === 1) {
+					if(command.options[i].type === 'SUB_COMMAND') {
 						(i === 0) ? usage += ` ${command.options[i].name}` : usage += `\`\n\`/${command.name} ${command.options[i].name}`;
 						for (let j = 0; j < command.options[i].options.length; j++) {
 							if(command.options[i].options[j].required) {
@@ -107,7 +106,7 @@ module.exports = {
 								usage += ` [${command.options[i].options[j].name}]`;
 							}
 						}
-					} else if(command.options[i].type === 2) {
+					} else if(command.options[i].type === 'SUB_COMMAND_GROUP') {
 						for (let j = 0; j < command.options[i].options.length; j++) {
 							(j === 0) ? usage += ` ${command.options[i].name}` : usage += `\`\n\`/${command.name} ${command.options[i].name}`;
 							usage += ` ${command.options[i].options[j].name}`;
@@ -133,16 +132,13 @@ module.exports = {
 
 			embed.setDescription(data.join('\n'));
 
-			client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
-				type: 4,
-				data: {
-					embeds: [embed.toJSON()],
-					files: [{
-						attachment: buffer,
-						name: 'file.jpg',
-					}],
-				},
-			} });
+			await interaction.reply({
+				embeds: [embed],
+				files: [{
+					attachment: buffer,
+					name: 'profile.png',
+				}],
+			});
 		});
 	},
 };

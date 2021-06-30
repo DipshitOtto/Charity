@@ -9,202 +9,201 @@ module.exports = {
 	name: 'manage',
 	description: 'Manage information, progress, and monitors for this server. Faction Admin Command."',
 	aliases: [],
-	// aliases: ['project', 'temp'],
 	guildOnly: true,
 	permissions: '',
 	cooldown: 3,
 	options: [
 		{
-			'type': 2,
-			'name': 'template',
-			'description': 'Manage a template in the template progress checker.',
-			'options': [
+			name: 'template',
+			type: 'SUB_COMMAND_GROUP',
+			description: 'Manage a template in the template progress checker.',
+			options: [
 				{
-					'type': 1,
-					'name': 'view',
-					'description': 'View a template in the progress checker.',
-					'options': [
+					name: 'view',
+					type: 'SUB_COMMAND',
+					description: 'View a template in the progress checker.',
+					options: [
 						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template you want to view in the progress checker.',
-							'default': false,
-							'required': true,
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template you want to view in the progress checker.',
+							required: true,
 						},
 					],
 				},
 				{
-					'type': 1,
-					'name': 'add',
-					'description': 'Add a template to the progress checker.',
-					'options': [
+					name: 'add',
+					type: 'SUB_COMMAND',
+					description: 'Add a template to the progress checker.',
+					options: [
 						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template you want to add to the progress checker.',
-							'default': false,
-							'required': true,
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template you want to add to the progress checker.',
+							required: true,
 						},
 						{
-							'type': 3,
-							'name': 'link',
-							'description': 'The template link of the template you want to add to the progress checker.',
-							'default': false,
-							'required': true,
+							name: 'link',
+							type: 'STRING',
+							description: 'The template link of the template you want to add to the progress checker.',
+							required: true,
+						},
+					],
+				},
+				/* {
+					name: 'edit',
+					type: 'SUB_COMMAND',
+					description: 'Edit a template in the progress checker.',
+					options: [
+						{
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template you want to edit in the progress checker.',
+							required: true,
+						},
+						{
+							name: 'key',
+							type: 'STRING',
+							description: 'The attribute of the template you want to edit.',
+							required: true,
+						},
+						{
+							name: 'value',
+							type: 'STRING',
+							description: 'The value of the attribute you want to edit.',
+							required: true,
+						},
+					],
+				},*/
+				{
+					name: 'remove',
+					type: 'SUB_COMMAND',
+					description: 'Remove a template from the progress checker.',
+					options: [
+						{
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template you want to remove from the progress checker.',
+							required: true,
 						},
 					],
 				},
 				{
-					'type': 1,
-					'name': 'edit',
-					'description': 'Edit a template in the progress checker.',
-					'options': [
+					name: 'update',
+					type: 'SUB_COMMAND',
+					description: 'Update a template in the progress checker.',
+					options: [
 						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template you want to edit in the progress checker.',
-							'default': false,
-							'required': true,
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template you want to update in the progress checker.',
+							required: true,
 						},
 						{
-							'type': 3,
-							'name': 'key',
-							'description': 'The attribute of the template you want to edit.',
-							'default': false,
-							'required': true,
-						},
-						{
-							'type': 3,
-							'name': 'value',
-							'description': 'The value of the attribute you want to edit.',
-							'default': false,
-							'required': true,
+							name: 'link',
+							type: 'STRING',
+							description: 'The template link of the template you want to update in the progress checker.',
+							required: true,
 						},
 					],
 				},
 				{
-					'type': 1,
-					'name': 'remove',
-					'description': 'Remove a template from the progress checker.',
-					'options': [
-						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template you want to remove from the progress checker.',
-							'default': false,
-							'required': true,
-						},
-					],
-				},
-				{
-					'type': 1,
-					'name': 'update',
-					'description': 'Update a template in the progress checker.',
-					'options': [
-						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template you want to update in the progress checker.',
-							'default': false,
-							'required': true,
-						},
-						{
-							'type': 3,
-							'name': 'link',
-							'description': 'The template link of the template you want to update in the progress checker.',
-							'default': false,
-							'required': true,
-						},
-					],
-				},
-				{
-					'type': 1,
-					'name': 'list',
-					'description': 'List the templates in the progress checker.',
-					'options': [],
+					name: 'list',
+					type: 'SUB_COMMAND',
+					description: 'List the templates in the progress checker.',
 				},
 			],
 		},
 		{
-			'type': 2,
-			'name': 'alert',
-			'description': 'Manage grief alert for a template in the template progress checker.',
-			'options': [
+			name: 'alert',
+			type: 'SUB_COMMAND_GROUP',
+			description: 'Manage grief alert for a template in the template progress checker.',
+			options: [
 				{
-					'type': 1,
-					'name': 'add',
-					'description': 'Add grief alert for a template to a specified channel.',
-					'options': [
+					name: 'add',
+					type: 'SUB_COMMAND',
+					description: 'Add grief alert for a template.',
+					options: [
 						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template to alert griefs for.',
-							'default': false,
-							'required': true,
+							name: 'type',
+							type: 'STRING',
+							description: 'The type of grief alert you want to add to the template.',
+							required: true,
+							choices: [
+								{
+									name: 'basic',
+									value: 'basic',
+								},
+								{
+									name: 'advanced',
+									value: 'advanced',
+								},
+							],
 						},
 						{
-							'type': 7,
-							'name': 'channel',
-							'description': 'The channel grief alerts should be sent to.',
-							'default': false,
-							'required': true,
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template to alert griefs for.',
+							required: true,
 						},
 						{
-							'type': 4,
-							'name': 'threshold',
-							'description': 'The amount of griefers required for grief alert to trigger a ping for this template.',
-							'required': false,
+							name: 'channel',
+							type: 'CHANNEL',
+							description: 'The channel grief alerts should be sent to.',
+							required: true,
 						},
 						{
-							'type': 9,
-							'name': 'role',
-							'description': 'The role to ping when the threshold is hit.',
-							'required': false,
+							name: 'threshold',
+							type: 'INTEGER',
+							description: 'The amount of griefers required for grief alert to trigger a ping. Not required for basic alerts.',
+							required: false,
+						},
+						{
+							name: 'role',
+							type: 'ROLE',
+							description: 'The role to ping when the threshold is hit. Not required for basic alerts.',
+							required: false,
 						},
 					],
 				},
 				{
-					'type': 1,
-					'name': 'remove',
-					'description': 'Remove grief alert for a template.',
-					'options': [
+					name: 'remove',
+					type: 'SUB_COMMAND',
+					description: 'Remove grief alert for a template.',
+					options: [
 						{
-							'type': 3,
-							'name': 'name',
-							'description': 'The name of the template to remove grief alert for.',
-							'default': false,
-							'required': true,
+							name: 'name',
+							type: 'STRING',
+							description: 'The name of the template to remove grief alert for.',
+							required: true,
 						},
 					],
 				},
 				{
-					'type': 1,
-					'name': 'list',
-					'description': 'List the templates with grief alert.',
-					'options': [],
+					name: 'list',
+					type: 'SUB_COMMAND',
+					description: 'List the templates with grief alert.',
 				},
 			],
 		},
 	],
-	async template(interaction, webhook) {
-		const command = interaction.options[0].name;
-		const args = interaction.options[0].options;
+	async template(interaction, subcommand) {
+		const command = subcommand.options.values().next().value;
+		const args = command.options;
 
-		if (command === 'view') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
+		if (command.name === 'view') {
+			const name = args.get('name');
 
 			const template = await database.getTemplate({
-				name: name,
-				gid: interaction.guild_id,
+				name: name.value,
+				gid: interaction.guildID,
 			});
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name} <template url>\`!`);
+					.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name.value} <template url>\`!`);
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			} else {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
@@ -222,29 +221,28 @@ module.exports = {
 								`scaleFactor: ${template.scaleFactor},\n` +
 								`reference: '${template.reference}'\`\`\``);
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			}
-		} else if (command === 'add') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
-			const link = (args.find(option => option.name == 'link')) ? args.find(option => option.name == 'link').value : null;
+		} else if (command.name === 'add') {
+			const name = args.get('name');
+			const link = args.get('link');
 
-			if (!!link.match(/[#&?]title=.*?(&|$)/g) && !!link.match(/[#&?]template=.*?(&|$)/g) && !!link.match(/[#&?]ox=.*?(&|$)/g) && !!link.match(/[#&?]oy=.*?(&|$)/g) && !!link.match(/[#&?]tw=.*?(&|$)/g)) {
+if (!!link.value.match(/[#&?]title=.*?(&|$)/g) && !!link.value.match(/[#&?]template=.*?(&|$)/g) && !!link.value.match(/[#&?]ox=.*?(&|$)/g) && !!link.value.match(/[#&?]oy=.*?(&|$)/g) && !!link.value.match(/[#&?]tw=.*?(&|$)/g)) {
 				let data = {
 					canvasCode: pxls.info().canvasCode,
-					gid: interaction.guild_id,
-					name: name,
+					gid: interaction.guildID,
+					name: name.value,
 					hidden: false,
-					title: decodeURIComponent(link.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
-					image: decodeURIComponent(link.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g)),
-					ox: parseInt(decodeURIComponent(link.match(/(?<=[#&?]ox=)(.*?)(?=&|$)/g))),
-					oy: parseInt(decodeURIComponent(link.match(/(?<=[#&?]oy=)(.*?)(?=&|$)/g))),
-					width: parseInt(decodeURIComponent(link.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
-					reference: link,
+					title: decodeURIComponent(link.value.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
+					image: decodeURIComponent(link.value.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g)),
+					ox: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]ox=)(.*?)(?=&|$)/g))),
+					oy: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]oy=)(.*?)(?=&|$)/g))),
+					width: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
+					reference: link.value,
 					alert: false,
+					alertType: null,
 					alertChannel: null,
-					alertThreshold: null,
+					alertThreshold: 1,
 					alertRole: null,
 				};
 
@@ -255,21 +253,19 @@ module.exports = {
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 
-				await database.addTemplate(name, interaction.guild_id, data);
+				await database.addTemplate(name.value, interaction.guildID, data);
 
 				const template = await database.getTemplate({
-					name: name,
-					gid: interaction.guild_id,
+					name: name.value,
+					gid: interaction.guildID,
 				});
 
 				if (template === null) {
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
-						.setDescription(`:x: Couldn't create template \`${name}\`!`);
+						.setDescription(`:x: Couldn't create template \`${name.value}\`!`);
 
-					return webhook.editMessage('@original', {
-						embeds: [embed.toJSON()],
-					});
+					return await interaction.editReply({ embeds: [embed] });
 				}
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
@@ -287,19 +283,15 @@ module.exports = {
 							`scaleFactor: ${template.scaleFactor},\n` +
 							`reference: '${template.reference}'\`\`\``);
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			} else {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setDescription(':x: You must provide a valid template link!\nThe proper usage would be: `/manage template add <template name> <template url>`');
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			}
-		} else if (command === 'edit') {
+		/* } else if (command.name === 'edit') {
 			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
 			const key = (args.find(option => option.name == 'key')) ? args.find(option => option.name == 'key').value : null;
 			const value = (args.find(option => option.name == 'value')) ? args.find(option => option.name == 'value').value : null;
@@ -413,41 +405,36 @@ module.exports = {
 				return webhook.editMessage('@original', {
 					embeds: [embed.toJSON()],
 				});
-			}
-		} else if (command === 'remove') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
+			}*/
+		} else if (command.name === 'remove') {
+			const name = args.get('name');
 
-			const result = await database.removeTemplate(name, interaction.guild_id);
+			const result = await database.removeTemplate(name.value, interaction.guildID);
 			if (result.deletedCount > 0) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:white_check_mark: Deleted template \`${name}\`!`);
+					.setDescription(`:white_check_mark: Deleted template \`${name.value}\`!`);
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			} else {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
-					.setDescription(`:x: Template \`${name}\` does not exist!`);
+					.setDescription(`:x: Template \`${name.value}\` does not exist!`);
 
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+				return await interaction.editReply({ embeds: [embed] });
 			}
+		} else if (command.name === 'update') {
+			const name = args.get('name');
+			const link = args.get('link');
 
-		} else if (command === 'update') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
-			const link = (args.find(option => option.name == 'link')) ? args.find(option => option.name == 'link').value : null;
-
-			if (!!link.match(/[#&?]title=.*?(&|$)/g) && !!link.match(/[#&?]template=.*?(&|$)/g) && !!link.match(/[#&?]ox=.*?(&|$)/g) && !!link.match(/[#&?]oy=.*?(&|$)/g) && !!link.match(/[#&?]tw=.*?(&|$)/g)) {
+      if (!!link.value.match(/[#&?]title=.*?(&|$)/g) && !!link.value.match(/[#&?]template=.*?(&|$)/g) && !!link.value.match(/[#&?]ox=.*?(&|$)/g) && !!link.value.match(/[#&?]oy=.*?(&|$)/g) && !!link.value.match(/[#&?]tw=.*?(&|$)/g)) {
 				let data = {
-					title: decodeURIComponent(link.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
-					image: decodeURIComponent(link.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g)),
-					ox: parseInt(decodeURIComponent(link.match(/(?<=[#&?]ox=)(.*?)(?=&|$)/g))),
-					oy: parseInt(decodeURIComponent(link.match(/(?<=[#&?]oy=)(.*?)(?=&|$)/g))),
-					width: parseInt(decodeURIComponent(link.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
-					reference: link,
+					title: decodeURIComponent(link.value.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
+					image: decodeURIComponent(link.value.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g)),
+					ox: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]ox=)(.*?)(?=&|$)/g))),
+					oy: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]oy=)(.*?)(?=&|$)/g))),
+					width: parseInt(decodeURIComponent(link.value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g))),
+					reference: link.value,
 				};
 
 				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
@@ -456,21 +443,19 @@ module.exports = {
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 
-				await database.editTemplate(name, interaction.guild_id, data);
+				await database.editTemplate(name.value, interaction.guildID, data);
 
 				const template = await database.getTemplate({
-					name: name,
-					gid: interaction.guild_id,
+					name: name.value,
+					gid: interaction.guildID,
 				});
 
 				if (template == null) {
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
-						.setDescription(`:x: Template \`${name}\` does not exist!\nYou can create it with \`/manage template add ${name} <template url>\`!`);
+						.setDescription(`:x: Template \`${name.value}\` does not exist!\nYou can create it with \`/manage template add ${name.value} <template url>\`!`);
 
-					return webhook.editMessage('@original', {
-						embeds: [embed.toJSON()],
-					});
+					return await interaction.editReply({ embeds: [embed] });
 				} else {
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
@@ -487,13 +472,11 @@ module.exports = {
 									`height: ${template.height},\n` +
 									`scaleFactor: ${template.scaleFactor},\n` +
 									`reference: '${template.reference}'\`\`\``);
-					return webhook.editMessage('@original', {
-						embeds: [embed.toJSON()],
-					});
+					return await interaction.editReply({ embeds: [embed] });
 				}
 			}
-		} else if (command === 'list') {
-			const templates = await database.listTemplates({ gid: interaction.guild_id });
+		} else if (command.name === 'list') {
+			const templates = await database.listTemplates({ gid: interaction.guildID });
 
 			const results = [];
 
@@ -508,79 +491,99 @@ module.exports = {
 				.setTitle('Templates:')
 				.setDescription(results.join('\n'));
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		}
 	},
-	async alert(interaction, webhook) {
-		const command = interaction.options[0].name;
-		const args = interaction.options[0].options;
+	async alert(interaction, subcommand, client) {
+		const command = subcommand.options.values().next().value;
+		const args = command.options;
 
-		if (command === 'add') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
-			const channel = (args.find(option => option.name == 'channel')) ? args.find(option => option.name == 'channel').value : null;
-			const threshold = (args.find(option => option.name == 'threshold')) ? args.find(option => option.name == 'threshold').value : 1;
-			const role = (args.find(option => option.name == 'role')) ? args.find(option => option.name == 'role').value : null;
+		if (command.name === 'add') {
+			const type = args.get('type');
+			const name = args.get('name');
+			const channelID = args.get('channel');
+			const threshold = args.get('threshold');
+			const role = args.get('role');
+
+			if (type.value === 'advanced' && (!threshold || !role)) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setDescription(':x: Advanced templates must include a threshold and a role!');
+
+				return await interaction.editReply({ embeds: [embed] });
+			}
+
+			if (client.channels.cache.get(channelID.value).type != 'text') {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setDescription(':x: Grief alert channels must be guild text channels!');
+
+				return await interaction.editReply({ embeds: [embed] });
+			}
 
 			const template = await database.getTemplate({
-				name: name,
-				gid: interaction.guild_id,
+				name: name.value,
+				gid: interaction.guildID,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if(!template) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:')
-					.setDescription(`:x: Template ${name} doesn't exist! You can create it with \`/manage template add ${name} <template url>\`!`);
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+					.setDescription(`:x: Template ${name.value} doesn't exist! You can create it with \`/manage template add ${name.value} <template url>\`!`);
+				return await interaction.editReply({ embeds: [embed] });
 			}
 
-			await database.editTemplate(name, interaction.guild_id, {
-				alert: true,
-				alertChannel: channel,
-				alertThreshold: (threshold) ? threshold : null,
-				alertRole: (role) ? role : null,
-			});
-
-			const embed = new Discord.MessageEmbed()
-				.setColor(process.env.BOT_COLOR)
-				.setTitle('Templates:')
-				.setDescription(`:white_check_mark: Added grief alert to ${name}!`);
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
-		} else if (command === 'remove') {
-			const name = (args.find(option => option.name == 'name')) ? args.find(option => option.name == 'name').value : null;
+			if (type.value === 'basic') {
+				await database.editTemplate(name.value, interaction.guildID, {
+					alert: true,
+					alertType: 'basic',
+					alertChannel: channelID.value,
+				});
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(`:white_check_mark: Added basic grief alert to ${name.value}!`);
+				return await interaction.editReply({ embeds: [embed] });
+			} else if (type.value === 'advanced') {
+				await database.editTemplate(name.value, interaction.guildID, {
+					alert: true,
+					alertType: 'advanced',
+					alertChannel: channelID.value,
+					alertThreshold: threshold.value,
+					alertRole: role.value,
+				});
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription(`:white_check_mark: Added advanced grief alert to ${name.value}!`);
+				return await interaction.editReply({ embeds: [embed] });
+			}
+		} else if (command.name === 'remove') {
+			const name = args.get('name');
 
 			const template = await database.getTemplate({
-				name: name,
-				gid: interaction.guild_id,
+				name: name.value,
+				gid: interaction.guildID,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if(!template) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:')
-					.setDescription(`:x: Template ${name} doesn't exist! You can create it with \`/manage template add ${name} <template url>\`!`);
-				return webhook.editMessage('@original', {
-					embeds: [embed.toJSON()],
-				});
+					.setDescription(`:x: Template ${name.value} doesn't exist! You can create it with \`/manage template add ${name.value} <template url>\`!`);
+				return await interaction.editReply({ embeds: [embed] });
 			}
 
-			await database.editTemplate(name, interaction.guild_id, { alert: false });
+			await database.editTemplate(name.value, interaction.guildID, { alert: false });
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Templates:')
-				.setDescription(`:white_check_mark: Removed grief alert from ${name}!`);
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
-		} else if (command === 'list') {
+				.setDescription(`:white_check_mark: Removed grief alert from ${name.value}!`);
+			return await interaction.editReply({ embeds: [embed] });
+		} else if (command.name === 'list') {
 			const templates = await database.listTemplates({
-				gid: interaction.guild_id,
+				gid: interaction.guildID,
 				canvasCode: pxls.info().canvasCode,
 				alert: true,
 			});
@@ -598,34 +601,27 @@ module.exports = {
 				.setTitle('Templates:')
 				.setDescription(results.join('\n'));
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		}
 	},
-	execute(interaction, client) {
-		const userID = (interaction.member.user.id) ? interaction.member.user.id : interaction.user.id;
-		const permissions = parseInt(interaction.member.permissions);
+	async execute(interaction, client) {
+		await interaction.defer();
 
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
-
-		if (userID === process.env.BOT_OWNER || (permissions & 0x20) == 0x20) {
-			const subcommand = interaction.data.options[0];
-			subcommand.guild_id = interaction.guild_id;
+		const authorPerms = interaction.member.permissionsIn(interaction.channelID);
+		if (!client.application?.owner) await client.application?.fetch();
+		if (interaction.user.id === client.application?.owner.id || authorPerms.has('BAN_MEMBERS') || authorPerms.has('MANAGE_GUILD')) {
+			const subcommand = interaction.options.values().next().value;
 			if(subcommand.name === 'template') {
-				module.exports.template(subcommand, webhook);
+				module.exports.template(interaction, subcommand, client);
 			} else if(subcommand.name === 'alert') {
-				module.exports.alert(subcommand, webhook);
+				module.exports.alert(interaction, subcommand, client);
 			}
 		} else {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: You don\'t have permission to manage information, progress, and monitors for this server!');
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		}
 	},
 };

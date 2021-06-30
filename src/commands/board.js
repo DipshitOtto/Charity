@@ -11,22 +11,21 @@ module.exports = {
 	permissions: '',
 	cooldown: 10,
 	options: [],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
 		const board = await canvas.board();
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Board!')
-			.setImage('attachment://file.jpg');
+			.setImage('attachment://board.png');
 
-		webhook.editMessage('@original', {
-			embeds: [embed.toJSON()],
+		await interaction.editReply({
+			embeds: [embed],
 			files: [{
 				attachment: board,
-				name: 'file.jpg',
+				name: 'board.png',
 			}],
 		});
 	},

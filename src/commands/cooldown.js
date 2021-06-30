@@ -11,18 +11,22 @@ module.exports = {
 	cooldown: 3,
 	options: [
 		{
-			'type': 4,
-			'name': 'users',
-			'description': 'The number of users you want to calculate the cooldown for.',
-			'default': false,
-			'required': false,
+			name: 'users',
+			type: 'INTEGER',
+			description: 'The number of users you want to calculate the cooldown for.',
+			required: false,
 		},
 	],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
-		const users = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'users').value : await pxls.users();
+		let users = interaction.options.get('users');
+		if(!users) {
+			users = await pxls.users();
+		} else {
+			users = users.value;
+		}
+
 		const cooldown = pxls.cooldown(users);
 
 		function format(cd) {
@@ -40,9 +44,7 @@ module.exports = {
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: Users cannot exceed 1386!');
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		}
 
 		let response = '';
@@ -56,8 +58,6 @@ module.exports = {
 			.setTitle(`Cooldown! (${users} Users)`)
 			.setDescription(`\`\`\`js\n${response.trim()}\`\`\``);
 
-		webhook.editMessage('@original', {
-			embeds: [embed.toJSON()],
-		});
+		await interaction.editReply({ embeds: [embed] });
 	},
 };
