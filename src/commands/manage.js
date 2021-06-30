@@ -231,7 +231,7 @@ module.exports = {
 			const link = (args.find(option => option.name == 'link')) ? args.find(option => option.name == 'link').value : null;
 
 			if (!!link.match(/[#&?]title=.*?(&|$)/g) && !!link.match(/[#&?]template=.*?(&|$)/g) && !!link.match(/[#&?]ox=.*?(&|$)/g) && !!link.match(/[#&?]oy=.*?(&|$)/g) && !!link.match(/[#&?]tw=.*?(&|$)/g)) {
-				const data = {
+				let data = {
 					canvasCode: pxls.info().canvasCode,
 					gid: interaction.guild_id,
 					name: name,
@@ -248,8 +248,9 @@ module.exports = {
 					alertRole: null,
 				};
 
-				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
 
+				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
+        data.width = await canvas.trueWidth(image.data, data.width);
 				data.scaleFactor = await canvas.scaleFactor(image.data, data.width);
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
@@ -440,7 +441,7 @@ module.exports = {
 			const link = (args.find(option => option.name == 'link')) ? args.find(option => option.name == 'link').value : null;
 
 			if (!!link.match(/[#&?]title=.*?(&|$)/g) && !!link.match(/[#&?]template=.*?(&|$)/g) && !!link.match(/[#&?]ox=.*?(&|$)/g) && !!link.match(/[#&?]oy=.*?(&|$)/g) && !!link.match(/[#&?]tw=.*?(&|$)/g)) {
-				const data = {
+				let data = {
 					title: decodeURIComponent(link.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
 					image: decodeURIComponent(link.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g)),
 					ox: parseInt(decodeURIComponent(link.match(/(?<=[#&?]ox=)(.*?)(?=&|$)/g))),
@@ -450,7 +451,7 @@ module.exports = {
 				};
 
 				const image = await axios.get(data.image, { responseType: 'arraybuffer' });
-
+        data.width = await canvas.trueWidth(image.data, data.width);
 				data.scaleFactor = await canvas.scaleFactor(image.data, data.width);
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
