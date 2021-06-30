@@ -276,7 +276,7 @@ module.exports = {
 		// crop top-left
 		const minX = x >= 0 ? 0 : -x;
 		const minY = y >= 0 ? 0 : -y;
-		template.crop(minX, minY, template.bitmap.width - minX, template.bitmap.height - minY)
+		template.crop(minX, minY, template.bitmap.width - minX, template.bitmap.height - minY);
 		x = Math.max(0, x);
 		y = Math.max(0, y);
 		// crop bottom-right

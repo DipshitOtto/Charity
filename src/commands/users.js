@@ -10,9 +10,8 @@ module.exports = {
 	permissions: '',
 	cooldown: 3,
 	options: [],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
 		const users = await pxls.users();
 
@@ -21,8 +20,6 @@ module.exports = {
 			.setTitle('Users!')
 			.setDescription(`There are ${users} user(s) on the site right now.`);
 
-		webhook.editMessage('@original', {
-			embeds: [embed.toJSON()],
-		});
+		await interaction.editReply({ embeds: [embed] });
 	},
 };

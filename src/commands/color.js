@@ -11,41 +11,37 @@ module.exports = {
 	cooldown: 5,
 	options: [
 		{
-			'type': 3,
-			'name': 'color',
-			'description': 'Color to be previewed. Can be a 3 or 6 character hex code, an rgb array, or a color name.',
-			'default': false,
-			'required': true,
+			name: 'color',
+			type: 'STRING',
+			description: 'Color to be previewed. Can be a 3 or 6 character hex code, an rgb array, or a color name.',
+			required: true,
 		},
 	],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
-		const color = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'color').value : null;
+		const color = interaction.options.get('color');
 
-		const buffer = await canvas.color(color);
+		const buffer = await canvas.color(color.value);
 
 		if(!buffer) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: That color doesn\'t exist!');
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
-			});
+			return await interaction.editReply({ embeds: [embed] });
 		}
 
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setTitle('Color Preview!')
-			.setImage('attachment://file.jpg');
+			.setImage('attachment://color.png');
 
-		webhook.editMessage('@original', {
-			embeds: [embed.toJSON()],
+		await interaction.editReply({
+			embeds: [embed],
 			files: [{
 				attachment: buffer,
-				name: 'file.jpg',
+				name: 'color.png',
 			}],
 		});
 	},

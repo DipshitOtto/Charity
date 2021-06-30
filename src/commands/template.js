@@ -14,21 +14,19 @@ module.exports = {
 	cooldown: 10,
 	options: [
 		{
-			'type': 3,
-			'name': 'name',
-			'description': 'The name of the template link to get.',
-			'default': false,
-			'required': true,
+			name: 'name',
+			type: 'STRING',
+			description: 'The name of the template link to get.',
+			required: true,
 		},
 	],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+	async execute(interaction) {
+		await interaction.defer();
 
-		const name = (interaction.data.options) ? interaction.data.options.find(option => option.name == 'name').value : null;
+		const name = interaction.options.get('name');
 		const template = await database.getTemplate({
-			name: name,
-			gid: interaction.guild_id,
+			name: name.value,
+			gid: interaction.guildID,
 			canvasCode: pxls.info().canvasCode,
 		});
 		const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
@@ -37,13 +35,13 @@ module.exports = {
 			.setColor(process.env.BOT_COLOR)
 			.setTitle(template.title)
 			.setURL(template.reference)
-			.setImage('attachment://file.jpg');
+			.setImage('attachment://template.png');
 
-		webhook.editMessage('@original', {
-			embeds: [embed.toJSON()],
+		await interaction.editReply({
+			embeds: [embed],
 			files: [{
 				attachment: templateSource,
-				name: 'file.jpg',
+				name: 'template.png',
 			}],
 		});
 	},

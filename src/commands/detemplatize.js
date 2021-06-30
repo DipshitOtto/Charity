@@ -13,22 +13,20 @@ module.exports = {
 	cooldown: 10,
 	options: [
 		{
-			'type': 3,
-			'name': 'link',
-			'description': 'The link to the template you are detemplatizing.',
-			'default': false,
-			'required': true,
+			name: 'link',
+			type: 'STRING',
+			description: 'The link to the template you are detemplatizing.',
+			required: true,
 		},
 	],
-	async execute(interaction, client) {
-		const webhook = new Discord.WebhookClient(client.user.id, interaction.token);
-		const templateLink = interaction.data.options.find(option => option.name == 'link').value;
+	async execute(interaction) {
+		const templateLink = interaction.options.get('link');
 
-		if (!!templateLink.match(/[#&?]template=.*?(&|$)/g) && !!templateLink.match(/[#&?]tw=.*?(&|$)/g)) {
-			client.api.interactions(interaction.id, interaction.token).callback.post({ data:{ type: 5 } });
+		if (!!templateLink.value.match(/[#&?]template=.*?(&|$)/g) && !!templateLink.value.match(/[#&?]tw=.*?(&|$)/g)) {
+			await interaction.defer();
 
-			const template = decodeURIComponent(templateLink.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
-			const width = parseInt(decodeURIComponent(templateLink.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g)));
+			const template = decodeURIComponent(templateLink.value.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
+			const width = parseInt(decodeURIComponent(templateLink.value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g)));
 
 			const image = await axios.get(template, { responseType: 'arraybuffer' });
 			const buffer = await canvas.detemplatize(image.data, width);
@@ -36,13 +34,13 @@ module.exports = {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Detemplatized!')
-				.setImage('attachment://file.jpg');
+				.setImage('attachment://detemplatized.png');
 
-			return webhook.editMessage('@original', {
-				embeds: [embed.toJSON()],
+			return await interaction.editReply({
+				embeds: [embed],
 				files: [{
 					attachment: buffer,
-					name: 'file.jpg',
+					name: 'detemplatized.png',
 				}],
 			});
 		} else {
@@ -50,12 +48,7 @@ module.exports = {
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: Invalid template link!');
 
-			return client.api.interactions(interaction.id, interaction.token).callback.post({ data: {
-				type: 4,
-				data: {
-					embeds: [embed.toJSON()],
-				},
-			} });
+			return await interaction.reply({ embeds: [embed] });
 		}
 	},
 };
