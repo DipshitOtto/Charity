@@ -3,6 +3,7 @@ const Jimp = require('jimp');
 
 let info;
 let board;
+const boardPalette = [];
 
 let failedPixels = [];
 
@@ -30,6 +31,7 @@ module.exports = {
 			const alpha = this.bitmap.data[idx + 3];
 
 			const index = boardData.data[board.bitmap.width * y + x];
+			boardPalette.push(index);
 			if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
 				if(index === 255) return;
 				const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
@@ -45,20 +47,14 @@ module.exports = {
 
 			const idx = (board.bitmap.width * y + x) << 2;
 
-			const red = board.bitmap.data[idx + 0];
-			const green = board.bitmap.data[idx + 1];
-			const blue = board.bitmap.data[idx + 2];
-			const alpha = board.bitmap.data[idx + 3];
-
 			const index = failedPixels[i].color;
-			if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
-				if(index === 255) return;
-				const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
-				board.bitmap.data[idx] = parseInt(color[1], 16);
-				board.bitmap.data[idx + 1] = parseInt(color[2], 16);
-				board.bitmap.data[idx + 2] = parseInt(color[3], 16);
-				board.bitmap.data[idx + 3] = 255;
-			}
+			boardPalette[board.bitmap.width * y + x] = index;
+			if(index === 255) return;
+			const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
+			board.bitmap.data[idx] = parseInt(color[1], 16);
+			board.bitmap.data[idx + 1] = parseInt(color[2], 16);
+			board.bitmap.data[idx + 2] = parseInt(color[3], 16);
+			board.bitmap.data[idx + 3] = 255;
 		}
 		failedPixels = [];
 		console.log('Board Initialized!');
@@ -71,6 +67,7 @@ module.exports = {
 			const idx = (board.bitmap.width * y + x) << 2;
 
 			const index = data.pixels[i].color;
+			boardPalette[board.bitmap.width * y + x] = index;
 			if(index === 255) return;
 			const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
 			board.bitmap.data[idx] = parseInt(color[1], 16);
@@ -89,6 +86,9 @@ module.exports = {
 	},
 	board() {
 		return board;
+	},
+	boardPalette() {
+		return boardPalette;
 	},
 	async users() {
 		let users = await axios.get(`${process.env.PXLS_URL}users`, { responseType: 'json' });

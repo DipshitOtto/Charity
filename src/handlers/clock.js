@@ -15,7 +15,7 @@ module.exports = {
 	async execute(client) {
 		pxls.createBoard();
 
-		alert.check(client, delay);
+		alert.checkAdvanced(client, delay);
 	},
 	getDelay() {
 		return delay;

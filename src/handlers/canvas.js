@@ -312,4 +312,31 @@ module.exports = {
 
 		return layered.getBufferAsync(Jimp.MIME_PNG);
 	},
+	async griefPreview(framing) {
+		const board = pxls.board();
+
+		framing.left = framing.left - 5;
+		framing.right = framing.right + 6;
+		framing.top = framing.top - 5;
+		framing.bottom = framing.bottom + 6;
+
+		if(framing.left < 0) framing.left = 0;
+		if(framing.top < 0) framing.top = 0;
+		if(framing.right > board.bitmap.width - 1) framing.right = board.bitmap.width - 1;
+		if(framing.bottom > board.bitmap.height - 1) framing.bottom = board.bitmap.height - 1;
+
+		const x = framing.left;
+		const y = framing.top;
+		const width = (framing.right - framing.left);
+		const height = (framing.bottom - framing.top);
+
+		let preview = await module.exports.board(x, y, width, height);
+
+		await Jimp.read(preview).then(image => {
+			image.scale(10, Jimp.RESIZE_NEAREST_NEIGHBOR);
+			preview = image.getBufferAsync(Jimp.MIME_PNG);
+		});
+
+		return preview;
+	},
 };

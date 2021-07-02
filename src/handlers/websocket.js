@@ -24,13 +24,13 @@ module.exports = {
 				console.log('Websocket Closed');
 				setTimeout(function() { module.exports.connect(); }, 5000);
 			});
-			connection.on('message', function(message) {
+			connection.on('message', async function(message) {
 				if (message.type === 'utf8') {
 					const data = JSON.parse(message.utf8Data);
 					try {
 						if(data.type === 'pixel') {
+							await alert.checkPixel(pxls.boardPalette(), data, client);
 							pxls.updateBoard(data);
-							alert.checkPixel(data, client);
 						}
 					} catch (error) {
 						if(data.type === 'pixel') {
