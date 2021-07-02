@@ -31,31 +31,18 @@ module.exports = {
 
 				for(let i = griefs.length - 1; i >= 0; i--) {
 					const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
-					if(griefsOnPixel.length === 1) {
-						const grief = griefsOnPixel[0];
-						if(pixelsPlaced < 5) {
-							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-						} else if(pixelsPlaced === 5) {
-							embedContent += 'and more...';
-						}
-						pixelsPlaced++;
-						if(grief.x < framing.left) framing.left = grief.x;
-						if(grief.x > framing.right) framing.right = grief.x;
-						if(grief.y < framing.top) framing.top = grief.y;
-						if(grief.y > framing.bottom) framing.bottom = grief.y;
-					} else if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) {
-						const grief = griefsOnPixel[griefsOnPixel.length - 1];
-						if(pixelsPlaced < 5) {
-							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-						} else if(pixelsPlaced === 5) {
-							embedContent += 'and more...';
-						}
-						pixelsPlaced++;
-						if(grief.x < framing.left) framing.left = grief.x;
-						if(grief.x > framing.right) framing.right = grief.x;
-						if(grief.y < framing.top) framing.top = grief.y;
-						if(grief.y > framing.bottom) framing.bottom = grief.y;
+					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
+					const grief = griefsOnPixel[0];
+					if(pixelsPlaced < 5) {
+						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+					} else if(pixelsPlaced === 5) {
+						embedContent += 'and more...';
 					}
+					pixelsPlaced++;
+					if(grief.x < framing.left) framing.left = grief.x;
+					if(grief.x > framing.right) framing.right = grief.x;
+					if(grief.y < framing.top) framing.top = grief.y;
+					if(grief.y > framing.bottom) framing.bottom = grief.y;
 
 					for(let j = 0; j < griefsOnPixel.length; j++) {
 						const index = griefs.indexOf(griefsOnPixel[j]);
@@ -97,7 +84,7 @@ module.exports = {
 					components: [row],
 				});
 
-				// basicGriefCounter[id] = [];
+				basicGriefCounter[id] = [];
 			}
 		}
 		basicAlert = false;
@@ -123,31 +110,18 @@ module.exports = {
 
 			for(let i = griefs.length - 1; i >= 0; i--) {
 				const griefsOnPixel = advancedGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
-				if(griefsOnPixel.length === 1) {
-					const grief = griefsOnPixel[0];
-					if(pixelsPlaced < 5) {
-						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-					} else if(pixelsPlaced === 5) {
-						embedContent += 'and more...';
-					}
-					pixelsPlaced++;
-					if(grief.x < framing.left) framing.left = grief.x;
-					if(grief.x > framing.right) framing.right = grief.x;
-					if(grief.y < framing.top) framing.top = grief.y;
-					if(grief.y > framing.bottom) framing.bottom = grief.y;
-				} else if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) {
-					const grief = griefsOnPixel[griefsOnPixel.length - 1];
-					if(pixelsPlaced < 5) {
-						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-					} else if(pixelsPlaced === 5) {
-						embedContent += 'and more...';
-					}
-					pixelsPlaced++;
-					if(grief.x < framing.left) framing.left = grief.x;
-					if(grief.x > framing.right) framing.right = grief.x;
-					if(grief.y < framing.top) framing.top = grief.y;
-					if(grief.y > framing.bottom) framing.bottom = grief.y;
+				if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
+				const grief = griefsOnPixel[0];
+				if(pixelsPlaced < 5) {
+					embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+				} else if(pixelsPlaced === 5) {
+					embedContent += 'and more...';
 				}
+				pixelsPlaced++;
+				if(grief.x < framing.left) framing.left = grief.x;
+				if(grief.x > framing.right) framing.right = grief.x;
+				if(grief.y < framing.top) framing.top = grief.y;
+				if(grief.y > framing.bottom) framing.bottom = grief.y;
 
 				for(let j = 0; j < griefsOnPixel.length; j++) {
 					const index = griefs.indexOf(griefsOnPixel[j]);
