@@ -32,7 +32,7 @@ module.exports = {
 				for(let i = griefs.length - 1; i >= 0; i--) {
 					const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
 					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
-					const grief = griefsOnPixel[0];
+					const grief = griefsOnPixel[griefsOnPixel.length - 1];
 					if(pixelsPlaced < 5) {
 						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
 					} else if(pixelsPlaced === 5) {
@@ -111,7 +111,7 @@ module.exports = {
 			for(let i = griefs.length - 1; i >= 0; i--) {
 				const griefsOnPixel = advancedGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
 				if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
-				const grief = griefsOnPixel[0];
+				const grief = griefsOnPixel[griefsOnPixel.length - 1];
 				if(pixelsPlaced < 5) {
 					embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
 				} else if(pixelsPlaced === 5) {
