@@ -18,7 +18,7 @@ module.exports = {
 				const template = await database.getTemplate({ _id: ObjectId(id) });
 				const palette = pxls.info().palette;
 				const griefs = basicGriefCounter[id];
-				if(basicGriefCounter[id].length === 0) return;
+				if(basicGriefCounter[id].length === 0) continue;
 
 				let embedContent = '';
 				let pixelsPlaced = 0;
@@ -97,7 +97,7 @@ module.exports = {
 					components: [row],
 				});
 
-				basicGriefCounter[id] = [];
+				// basicGriefCounter[id] = [];
 			}
 		}
 		basicAlert = false;
@@ -108,7 +108,7 @@ module.exports = {
 			const template = await database.getTemplate({ _id: ObjectId(id) });
 			const palette = pxls.info().palette;
 			const griefs = advancedGriefCounter[id];
-			if(advancedGriefCounter[id].length === 0) return;
+			if(advancedGriefCounter[id].length === 0) continue;
 			let users = Math.round(advancedGriefCounter[id].length / ((60 * delay) / pxls.cooldown(await pxls.users())));
 			if(users === 0) users = 1;
 
