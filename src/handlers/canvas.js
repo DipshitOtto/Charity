@@ -147,24 +147,24 @@ module.exports = {
 
 		return data;
 	},
-  async trueWidth(buffer, width) {
-    let newWidth;
-    if (width>0){
-      newWidth = width;
-    } else {
-      const fileType = await FileType.fromBuffer(buffer);
-      if (fileType.mime === 'image/webp') {
-        const decoder = new DWebp(buffer);
-        buffer = await decoder.toBuffer();
-      }
-      let result;
-      await Jimp.read(buffer).then(image => {
-        result = image;
-      });
-		  newWidth = result.bitmap.width;
-    }
-    return newWidth;
-  },
+	async trueWidth(buffer, width) {
+		let newWidth;
+		if (width > 0) {
+			newWidth = width;
+		} else {
+			const fileType = await FileType.fromBuffer(buffer);
+			if (fileType.mime === 'image/webp') {
+				const decoder = new DWebp(buffer);
+				buffer = await decoder.toBuffer();
+			}
+			let result;
+			await Jimp.read(buffer).then(image => {
+				result = image;
+			});
+			newWidth = result.bitmap.width;
+		}
+		return newWidth;
+	},
 	async scaleFactor(buffer, width) {
 		const fileType = await FileType.fromBuffer(buffer);
 		if (fileType.mime === 'image/webp') {
