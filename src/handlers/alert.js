@@ -33,33 +33,39 @@ module.exports = {
 					const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
 					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
 					const grief = griefsOnPixel[griefsOnPixel.length - 1];
-					if(pixelsPlaced < 5) {
-						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-					} else if(pixelsPlaced === 5) {
-						embedContent += 'and more...';
-					}
-					pixelsPlaced++;
-					if(grief.x < framing.left) framing.left = grief.x;
-					if(grief.x > framing.right) framing.right = grief.x;
-					if(grief.y < framing.top) framing.top = grief.y;
-					if(grief.y > framing.bottom) framing.bottom = grief.y;
+					if(grief) {
+						if(pixelsPlaced < 5) {
+							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+						} else if(pixelsPlaced === 5) {
+							embedContent += 'and more...';
+						}
+						pixelsPlaced++;
+						if(grief.x < framing.left) framing.left = grief.x;
+						if(grief.x > framing.right) framing.right = grief.x;
+						if(grief.y < framing.top) framing.top = grief.y;
+						if(grief.y > framing.bottom) framing.bottom = grief.y;
 
-					for(let j = 0; j < griefsOnPixel.length; j++) {
-						const index = griefs.indexOf(griefsOnPixel[j]);
-						if(index > -1) {
-							griefs.splice(index, 1);
+						for(let j = 0; j < griefsOnPixel.length; j++) {
+							const index = griefs.indexOf(griefsOnPixel[j]);
+							if(index > -1) {
+								griefs.splice(index, 1);
+							}
 						}
 					}
 				}
-
-				const centerX = Math.round((framing.left + framing.right) / 2);
-				const centerY = Math.round((framing.top + framing.bottom) / 2);
 
 				const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
 				const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
 				const diffImage = await canvas.diffImages(templateSource, actual);
 
-				const preview = await canvas.griefPreview(framing);
+				let centerX;
+				let centerY;
+				let preview;
+				if(framing.left <= framing.right && framing.top <= framing.bottom) {
+					centerX = Math.round((framing.left + framing.right) / 2);
+					centerY = Math.round((framing.top + framing.bottom) / 2);
+					preview = await canvas.griefPreview(framing);
+				}
 
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
@@ -75,14 +81,16 @@ module.exports = {
 							.setLabel('Template Link!')
 							.setStyle('LINK'),
 					);
-				client.channels.cache.get(template.alertChannel).send({
-					embeds:[embed],
-					files: [{
-						attachment: preview,
-						name: 'grief.png',
-					}],
-					components: [row],
-				});
+				if(preview) {
+					client.channels.cache.get(template.alertChannel).send({
+						embeds:[embed],
+						files: [{
+							attachment: preview,
+							name: 'grief.png',
+						}],
+						components: [row],
+					});
+				}
 
 				basicGriefCounter[id] = [];
 			}
@@ -112,33 +120,39 @@ module.exports = {
 				const griefsOnPixel = advancedGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
 				if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
 				const grief = griefsOnPixel[griefsOnPixel.length - 1];
-				if(pixelsPlaced < 5) {
-					embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-				} else if(pixelsPlaced === 5) {
-					embedContent += 'and more...';
-				}
-				pixelsPlaced++;
-				if(grief.x < framing.left) framing.left = grief.x;
-				if(grief.x > framing.right) framing.right = grief.x;
-				if(grief.y < framing.top) framing.top = grief.y;
-				if(grief.y > framing.bottom) framing.bottom = grief.y;
+				if(grief) {
+					if(pixelsPlaced < 5) {
+						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+					} else if(pixelsPlaced === 5) {
+						embedContent += 'and more...';
+					}
+					pixelsPlaced++;
+					if(grief.x < framing.left) framing.left = grief.x;
+					if(grief.x > framing.right) framing.right = grief.x;
+					if(grief.y < framing.top) framing.top = grief.y;
+					if(grief.y > framing.bottom) framing.bottom = grief.y;
 
-				for(let j = 0; j < griefsOnPixel.length; j++) {
-					const index = griefs.indexOf(griefsOnPixel[j]);
-					if(index > -1) {
-						griefs.splice(index, 1);
+					for(let j = 0; j < griefsOnPixel.length; j++) {
+						const index = griefs.indexOf(griefsOnPixel[j]);
+						if(index > -1) {
+							griefs.splice(index, 1);
+						}
 					}
 				}
 			}
-
-			const centerX = Math.round((framing.left + framing.right) / 2);
-			const centerY = Math.round((framing.top + framing.bottom) / 2);
 
 			const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
 			const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
 			const diffImage = await canvas.diffImages(templateSource, actual);
 
-			const preview = await canvas.griefPreview(framing);
+			let centerX;
+			let centerY;
+			let preview;
+			if(framing.left <= framing.right && framing.top <= framing.bottom) {
+				centerX = Math.round((framing.left + framing.right) / 2);
+				centerY = Math.round((framing.top + framing.bottom) / 2);
+				preview = await canvas.griefPreview(framing);
+			}
 
 			const embed = new Discord.MessageEmbed()
 				.setTitle(':warning: Grief Alert!')
@@ -152,14 +166,16 @@ module.exports = {
 						.setLabel('Template Link!')
 						.setStyle('LINK'),
 				);
-			client.channels.cache.get(template.alertChannel).send({
-				embeds:[embed],
-				files: [{
-					attachment: preview,
-					name: 'grief.png',
-				}],
-				components: [row],
-			});
+			if(preview) {
+				client.channels.cache.get(template.alertChannel).send({
+					embeds:[embed],
+					files: [{
+						attachment: preview,
+						name: 'grief.png',
+					}],
+					components: [row],
+				});
+			}
 			if(users >= template.alertThreshold) {
 				if (template.alertRole && (!lastAttackDate[id] || Date.now() - lastAttackDate[id] >= 60 * 60 * 1000)) {
 					client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
