@@ -113,24 +113,25 @@ module.exports = {
 
 			for(let i = griefs.length - 1; i >= 0; i--) {
 				const griefsOnPixel = advancedGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
-				if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
-				const grief = griefsOnPixel[griefsOnPixel.length - 1];
-				if(grief) {
-					if(pixelsPlaced < 5) {
-						embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-					} else if(pixelsPlaced === 5) {
-						embedContent += 'and more...';
-					}
-					pixelsPlaced++;
-					if(grief.x < framing.left) framing.left = grief.x;
-					if(grief.x > framing.right) framing.right = grief.x;
-					if(grief.y < framing.top) framing.top = grief.y;
-					if(grief.y > framing.bottom) framing.bottom = grief.y;
+				if(!griefsOnPixel[griefsOnPixel.length - 1].alerted) {
+					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
+					if(griefsOnPixel[griefsOnPixel.length - 1].color === griefsOnPixel[griefsOnPixel.length - 1].shouldBe) continue;
+					const grief = griefsOnPixel[griefsOnPixel.length - 1];
+					if(grief) {
+						if(pixelsPlaced < 5) {
+							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+						} else if(pixelsPlaced === 5) {
+							embedContent += 'and more...';
+						}
+						pixelsPlaced++;
+						if(grief.x < framing.left) framing.left = grief.x;
+						if(grief.x > framing.right) framing.right = grief.x;
+						if(grief.y < framing.top) framing.top = grief.y;
+						if(grief.y > framing.bottom) framing.bottom = grief.y;
 
-					for(let j = 0; j < griefsOnPixel.length; j++) {
-						const index = griefs.indexOf(griefsOnPixel[j]);
-						if(index > -1) {
-							griefs.splice(index, 1);
+						for(let j = 0; j < griefsOnPixel.length; j++) {
+							const index = griefs.indexOf(griefsOnPixel[j]);
+							griefs[index].alerted = true;
 						}
 					}
 				}
@@ -176,7 +177,6 @@ module.exports = {
 					client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
 				}
 			}
-			advancedGriefCounter[id] = 0;
 			lastAttackDate[id] = Date.now();
 		}
 	},
@@ -249,12 +249,20 @@ module.exports = {
 			});
 		}
 	},
-	clearExpiredPixels() {
+	clearExpiredPixels(delay) {
 		for (const id in basicGriefCounter) {
 			for(let i = 0; i < basicGriefCounter[id].length; i++) {
 				if(Date.now() - basicGriefCounter[id][i].timestamp >= 6000 * 2) {
 					basicGriefCounter[id][i];
 					basicGriefCounter[id].splice(i, 1);
+				}
+			}
+		}
+		for (const id in advancedGriefCounter) {
+			for(let i = 0; i < advancedGriefCounter[id].length; i++) {
+				if(Date.now() - advancedGriefCounter[id][i].timestamp >= delay * 60 * 1000 * 2) {
+					advancedGriefCounter[id][i];
+					advancedGriefCounter[id].splice(i, 1);
 				}
 			}
 		}
