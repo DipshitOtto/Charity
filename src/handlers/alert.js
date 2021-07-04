@@ -5,33 +5,33 @@ const pxls = require('../pxls');
 const database = require('./database');
 const canvas = require('../handlers/canvas');
 
-let basicAlert = false;
 const basicGriefCounter = {};
 const advancedGriefCounter = {};
 const lastAttackDate = {};
 
 module.exports = {
 	async checkBasic(client) {
-		if (basicAlert) {
-			for (const id in basicGriefCounter) {
-				const board = pxls.board();
-				const template = await database.getTemplate({ _id: ObjectId(id) });
-				const palette = pxls.info().palette;
-				const griefs = basicGriefCounter[id];
-				if(basicGriefCounter[id].length === 0) continue;
+		for (const id in basicGriefCounter) {
+			const board = pxls.board();
+			const template = await database.getTemplate({ _id: ObjectId(id) });
+			const palette = pxls.info().palette;
+			const griefs = basicGriefCounter[id];
+			if(basicGriefCounter[id].length === 0) continue;
 
-				let embedContent = '';
-				let pixelsPlaced = 0;
-				const framing = {
-					left: board.bitmap.width,
-					right: 0,
-					top: board.bitmap.height,
-					bottom: 0,
-				};
+			let embedContent = '';
+			let pixelsPlaced = 0;
+			const framing = {
+				left: board.bitmap.width,
+				right: 0,
+				top: board.bitmap.height,
+				bottom: 0,
+			};
 
-				for(let i = griefs.length - 1; i >= 0; i--) {
-					const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
+			for(let i = griefs.length - 1; i >= 0; i--) {
+				const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
+				if(!griefsOnPixel[griefsOnPixel.length - 1].alerted) {
 					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
+					if(griefsOnPixel[griefsOnPixel.length - 1].color === griefsOnPixel[griefsOnPixel.length - 1].shouldBe) continue;
 					const grief = griefsOnPixel[griefsOnPixel.length - 1];
 					if(grief) {
 						if(pixelsPlaced < 5) {
@@ -47,55 +47,50 @@ module.exports = {
 
 						for(let j = 0; j < griefsOnPixel.length; j++) {
 							const index = griefs.indexOf(griefsOnPixel[j]);
-							if(index > -1) {
-								griefs.splice(index, 1);
-							}
+							griefs[index].alerted = true;
 						}
 					}
 				}
+			}
 
-				const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
-				const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
-				const diffImage = await canvas.diffImages(templateSource, actual);
+			const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
+			const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
+			const diffImage = await canvas.diffImages(templateSource, actual);
 
-				let centerX;
-				let centerY;
-				let preview;
-				if(framing.left <= framing.right && framing.top <= framing.bottom) {
-					centerX = Math.round((framing.left + framing.right) / 2);
-					centerY = Math.round((framing.top + framing.bottom) / 2);
-					preview = await canvas.griefPreview(framing);
-				}
+			let centerX;
+			let centerY;
+			let preview;
+			if(framing.left <= framing.right && framing.top <= framing.bottom) {
+				centerX = Math.round((framing.left + framing.right) / 2);
+				centerY = Math.round((framing.top + framing.bottom) / 2);
+				preview = await canvas.griefPreview(framing);
+			}
 
-				const embed = new Discord.MessageEmbed()
-					.setColor(process.env.BOT_COLOR)
-					.setTitle(':warning: Grief Alert!')
-					.setAuthor(`${template.title} (${diffImage.percentageComplete + '%'})`)
-					.setDescription(embedContent.trim())
-					.setImage('attachment://grief.png');
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setTitle(':warning: Grief Alert!')
+				.setAuthor(`${template.title} (${diffImage.percentageComplete + '%'})`)
+				.setDescription(embedContent.trim())
+				.setImage('attachment://grief.png');
 
-				const row = new Discord.MessageActionRow()
-					.addComponents(
-						new Discord.MessageButton()
-							.setURL(`${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${centerX}&y=${centerY}&scale=50&title=${encodeURIComponent(template.title)}`)
-							.setLabel('Template Link!')
-							.setStyle('LINK'),
-					);
-				if(preview) {
-					client.channels.cache.get(template.alertChannel).send({
-						embeds:[embed],
-						files: [{
-							attachment: preview,
-							name: 'grief.png',
-						}],
-						components: [row],
-					});
-				}
-
-				basicGriefCounter[id] = [];
+			const row = new Discord.MessageActionRow()
+				.addComponents(
+					new Discord.MessageButton()
+						.setURL(`${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${centerX}&y=${centerY}&scale=50&title=${encodeURIComponent(template.title)}`)
+						.setLabel('Template Link!')
+						.setStyle('LINK'),
+				);
+			if(preview) {
+				client.channels.cache.get(template.alertChannel).send({
+					embeds:[embed],
+					files: [{
+						attachment: preview,
+						name: 'grief.png',
+					}],
+					components: [row],
+				});
 			}
 		}
-		basicAlert = false;
 	},
 	async checkAdvanced(client, delay) {
 		for (const id in advancedGriefCounter) {
@@ -211,12 +206,11 @@ module.exports = {
 						color: color,
 						oldColor: oldBoard[board.bitmap.width * y + x],
 						shouldBe: template.source[idx],
+						timestamp: Date.now(),
+						alerted: false,
 					};
 					if(template.source[idx] != color && template.source[idx] != 255 && color != 255) {
-						if(!basicAlert) {
-							basicAlert = true;
-							setTimeout(function() { module.exports.checkBasic(client); }, 6000);
-						}
+						setTimeout(function() { module.exports.checkBasic(client); }, 6000);
 						basicGriefCounter[template._id].push(griefData);
 					} else if(basicGriefCounter[template._id].some(e => e.x === x && e.y === y)) {
 						basicGriefCounter[template._id].push(griefData);
@@ -243,14 +237,26 @@ module.exports = {
 						color: color,
 						oldColor: oldBoard[board.bitmap.width * y + x],
 						shouldBe: template.source[idx],
+						timestamp: Date.now(),
+						alerted: false,
 					};
 					if(template.source[idx] != color && template.source[idx] != 255 && color != 255) {
 						advancedGriefCounter[template._id].push(griefData);
-					} else if(basicGriefCounter[template._id].some(e => e.x === x && e.y === y)) {
+					} else if(advancedGriefCounter[template._id].some(e => e.x === x && e.y === y)) {
 						advancedGriefCounter[template._id].push(griefData);
 					}
 				}
 			});
+		}
+	},
+	clearExpiredPixels() {
+		for (const id in basicGriefCounter) {
+			for(let i = 0; i < basicGriefCounter[id].length; i++) {
+				if(Date.now() - basicGriefCounter[id][i].timestamp >= 6000 * 2) {
+					basicGriefCounter[id][i];
+					basicGriefCounter[id].splice(i, 1);
+				}
+			}
 		}
 	},
 };

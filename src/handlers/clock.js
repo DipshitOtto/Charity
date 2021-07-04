@@ -8,14 +8,18 @@ module.exports = {
 		setInterval(function() {
 			const currentdate = new Date();
 			if(currentdate.getMinutes() % delay == 0 && currentdate.getSeconds() == 0) {
-				module.exports.execute(client);
+				module.exports.executeSlow(client);
 			}
+			module.exports.executeFast();
 		}, 1000);
 	},
-	async execute(client) {
+	async executeSlow(client) {
 		pxls.createBoard();
 
 		alert.checkAdvanced(client, delay);
+	},
+	async executeFast() {
+		alert.clearExpiredPixels();
 	},
 	getDelay() {
 		return delay;
