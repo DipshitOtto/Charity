@@ -114,9 +114,9 @@ module.exports = {
 			if(griefingUsers > helpingUsers) {
 				embedContent += `The griefers have been estimated to outnumber you by **${griefingUsers - helpingUsers}** user(s)!\n`;
 			} else if(helpingUsers > griefingUsers) {
-				embedContent = `You have been estimated to outnumber the griefers by **${helpingUsers - griefingUsers}** user(s)!\n`;
+				embedContent += `You have been estimated to outnumber the griefers by **${helpingUsers - griefingUsers}** user(s)!\n`;
 			} else {
-				embedContent = 'Both you and the griefers have been estimated to have the same amount of users!\n';
+				embedContent += 'Both you and the griefers have been estimated to have the same amount of users!\n';
 			}
 
 			if(griefedPixels.length > correctPixels.length) {
