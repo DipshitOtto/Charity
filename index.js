@@ -86,6 +86,13 @@ client.on('message', async message => {
 			message.channel.send({ embeds: [embed] });
 		}
 	}
+	if (command === 'crash') {
+		const embed = new Discord.MessageEmbed()
+			.setColor(process.env.BOT_COLOR)
+			.setDescription(':white_check_mark: Crashing!');
+		message.channel.send({ embeds: [embed] });
+		process.abort();
+	}
 });
 
 client.on('interaction', async interaction => {

@@ -33,6 +33,10 @@ module.exports = {
 						.setURL(process.env.DISCORD_URL)
 						.setLabel('Join the Discord!')
 						.setStyle('LINK'),
+					new Discord.MessageButton()
+						.setURL(`https://discord.com/oauth2/authorize?client_id=${process.env.APP_ID}&scope=applications.commands%20bot&permissions=${process.env.INVITE_PERMS}`)
+						.setLabel('Invite Charity to your Faction!')
+						.setStyle('LINK'),
 				);
 
 			const embed = new Discord.MessageEmbed()
