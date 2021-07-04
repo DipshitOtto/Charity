@@ -19,7 +19,7 @@ module.exports = {
 		alert.checkAdvanced(client, delay);
 	},
 	async executeFast() {
-		alert.clearExpiredPixels(delay);
+		alert.clearExpiredPixels(true);
 	},
 	getDelay() {
 		return delay;

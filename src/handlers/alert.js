@@ -1,270 +1,247 @@
 const Discord = require('discord.js');
-const ObjectId = require('mongodb').ObjectId;
 
 const pxls = require('../pxls');
 const database = require('./database');
 const canvas = require('../handlers/canvas');
 
-const basicGriefCounter = {};
-const advancedGriefCounter = {};
-const lastAttackDate = {};
+const basicDelay = 6 * 1000;
+const pixels = [];
 
 module.exports = {
-	async checkBasic(client) {
-		for (const id in basicGriefCounter) {
-			const board = pxls.board();
-			const template = await database.getTemplate({ _id: ObjectId(id) });
-			const palette = pxls.info().palette;
-			const griefs = basicGriefCounter[id];
-			if(basicGriefCounter[id].length === 0) continue;
-
-			let embedContent = '';
-			let pixelsPlaced = 0;
-			const framing = {
-				left: board.bitmap.width,
-				right: 0,
-				top: board.bitmap.height,
-				bottom: 0,
-			};
-
-			for(let i = griefs.length - 1; i >= 0; i--) {
-				const griefsOnPixel = basicGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
-				if(!griefsOnPixel[griefsOnPixel.length - 1].alerted) {
-					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
-					if(griefsOnPixel[griefsOnPixel.length - 1].color === griefsOnPixel[griefsOnPixel.length - 1].shouldBe) continue;
-					const grief = griefsOnPixel[griefsOnPixel.length - 1];
-					if(grief) {
-						if(pixelsPlaced < 5) {
-							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-						} else if(pixelsPlaced === 5) {
-							embedContent += 'and more...';
-						}
-						pixelsPlaced++;
-						if(grief.x < framing.left) framing.left = grief.x;
-						if(grief.x > framing.right) framing.right = grief.x;
-						if(grief.y < framing.top) framing.top = grief.y;
-						if(grief.y > framing.bottom) framing.bottom = grief.y;
-
-						for(let j = 0; j < griefsOnPixel.length; j++) {
-							const index = griefs.indexOf(griefsOnPixel[j]);
-							griefs[index].alerted = true;
-						}
-					}
-				}
-			}
-
-			const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
-			const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
-			const diffImage = await canvas.diffImages(templateSource, actual);
-
-			let centerX;
-			let centerY;
-			let preview;
-			if(framing.left <= framing.right && framing.top <= framing.bottom) {
-				centerX = Math.round((framing.left + framing.right) / 2);
-				centerY = Math.round((framing.top + framing.bottom) / 2);
-				preview = await canvas.griefPreview(framing);
-			}
-
-			const embed = new Discord.MessageEmbed()
-				.setColor(process.env.BOT_COLOR)
-				.setTitle(':warning: Grief Alert!')
-				.setAuthor(`${template.title} (${diffImage.percentageComplete + '%'})`)
-				.setDescription(embedContent.trim())
-				.setImage('attachment://grief.png');
-
-			const row = new Discord.MessageActionRow()
-				.addComponents(
-					new Discord.MessageButton()
-						.setURL(`${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${centerX}&y=${centerY}&scale=50&title=${encodeURIComponent(template.title)}`)
-						.setLabel('Template Link!')
-						.setStyle('LINK'),
-				);
-			if(preview) {
-				client.channels.cache.get(template.alertChannel).send({
-					embeds:[embed],
-					files: [{
-						attachment: preview,
-						name: 'grief.png',
-					}],
-					components: [row],
-				});
-			}
-		}
-	},
-	async checkAdvanced(client, delay) {
-		for (const id in advancedGriefCounter) {
-			const board = pxls.board();
-			const template = await database.getTemplate({ _id: ObjectId(id) });
-			const palette = pxls.info().palette;
-			const griefs = advancedGriefCounter[id];
-			if(advancedGriefCounter[id].length === 0) continue;
-			let users = Math.round(advancedGriefCounter[id].length / ((60 * delay) / pxls.cooldown(await pxls.users())));
-			if(users === 0) users = 1;
-
-			let embedContent = '';
-			let pixelsPlaced = 0;
-			const framing = {
-				left: board.bitmap.width,
-				right: 0,
-				top: board.bitmap.height,
-				bottom: 0,
-			};
-
-			for(let i = griefs.length - 1; i >= 0; i--) {
-				const griefsOnPixel = advancedGriefCounter[template._id].filter(e => e.x === griefs[i].x && e.y === griefs[i].y);
-				if(!griefsOnPixel[griefsOnPixel.length - 1].alerted) {
-					if(griefsOnPixel[0] && griefsOnPixel[0].oldColor === griefsOnPixel[griefsOnPixel.length - 1].color) continue;
-					if(griefsOnPixel[griefsOnPixel.length - 1].color === griefsOnPixel[griefsOnPixel.length - 1].shouldBe) continue;
-					const grief = griefsOnPixel[griefsOnPixel.length - 1];
-					if(grief) {
-						if(pixelsPlaced < 5) {
-							embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${griefs[i].x}&y=${griefs[i].y}&scale=50&title=${encodeURIComponent(template.title)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
-						} else if(pixelsPlaced === 5) {
-							embedContent += 'and more...';
-						}
-						pixelsPlaced++;
-						if(grief.x < framing.left) framing.left = grief.x;
-						if(grief.x > framing.right) framing.right = grief.x;
-						if(grief.y < framing.top) framing.top = grief.y;
-						if(grief.y > framing.bottom) framing.bottom = grief.y;
-
-						for(let j = 0; j < griefsOnPixel.length; j++) {
-							const index = griefs.indexOf(griefsOnPixel[j]);
-							griefs[index].alerted = true;
-						}
-					}
-				}
-			}
-
-			const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
-			const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
-			const diffImage = await canvas.diffImages(templateSource, actual);
-
-			let centerX;
-			let centerY;
-			let preview;
-			if(framing.left <= framing.right && framing.top <= framing.bottom) {
-				centerX = Math.round((framing.left + framing.right) / 2);
-				centerY = Math.round((framing.top + framing.bottom) / 2);
-				preview = await canvas.griefPreview(framing);
-			}
-
-			const embed = new Discord.MessageEmbed()
-				.setTitle(':warning: Grief Alert!')
-				.setAuthor(`${template.title} (${diffImage.percentageComplete + '%'})`)
-				.setDescription(`Roughly **${users}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\n\n` + embedContent.trim())
-				.setImage('attachment://grief.png');
-			const row = new Discord.MessageActionRow()
-				.addComponents(
-					new Discord.MessageButton()
-						.setURL(`${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${centerX}&y=${centerY}&scale=50&title=${encodeURIComponent(template.title)}`)
-						.setLabel('Template Link!')
-						.setStyle('LINK'),
-				);
-			if(preview) {
-				client.channels.cache.get(template.alertChannel).send({
-					embeds:[embed],
-					files: [{
-						attachment: preview,
-						name: 'grief.png',
-					}],
-					components: [row],
-				});
-			}
-			if(users >= template.alertThreshold) {
-				if (template.alertRole && (!lastAttackDate[id] || Date.now() - lastAttackDate[id] >= 60 * 60 * 1000)) {
-					client.channels.cache.get(template.alertChannel).send(`<@&${template.alertRole}>`);
-				}
-			}
-			lastAttackDate[id] = Date.now();
-		}
-	},
 	async checkPixel(oldBoard, data, client) {
 		for(let i = 0; i < data.pixels.length; i++) {
 			const x = data.pixels[i].x;
 			const y = data.pixels[i].y;
 			const color = data.pixels[i].color;
 
-			const basicTemplates = await database.listTemplates({
+			const templates = await database.listTemplates({
 				canvasCode: pxls.info().canvasCode,
 				alert: true,
-				alertType: 'basic',
 			});
-			basicTemplates.forEach(template => {
-				if(x >= template.ox && x < (template.ox + template.width) && y >= template.oy && y < (template.oy + template.height)) {
-					const idx = template.width * (y - template.oy) + (x - template.ox);
 
-					if(!basicGriefCounter[template._id]) {
-						basicGriefCounter[template._id] = [];
-					}
+			templates.forEach(template => {
+				const idx = template.width * (y - template.oy) + (x - template.ox);
+				const shouldBe = template.source[idx];
 
-					const board = pxls.board();
-					const griefData = {
+				if(x >= template.ox && x < (template.ox + template.width) && y >= template.oy && y < (template.oy + template.height) && shouldBe != 255) {
+					const pixelData = {
 						x: x,
 						y: y,
 						color: color,
-						oldColor: oldBoard[board.bitmap.width * y + x],
-						shouldBe: template.source[idx],
+						oldColor: oldBoard[pxls.info().width * y + x],
+						shouldBe: shouldBe,
 						timestamp: Date.now(),
+						template: template,
+						parsed: false,
 						alerted: false,
 					};
-					if(template.source[idx] != color && template.source[idx] != 255 && color != 255) {
-						setTimeout(function() { module.exports.checkBasic(client); }, 6000);
-						basicGriefCounter[template._id].push(griefData);
-					} else if(basicGriefCounter[template._id].some(e => e.x === x && e.y === y)) {
-						basicGriefCounter[template._id].push(griefData);
-					}
-				}
-			});
 
-			const advancedTemplates = await database.listTemplates({
-				canvasCode: pxls.info().canvasCode,
-				alert: true,
-				alertType: 'advanced',
-			});
-			advancedTemplates.forEach(template => {
-				if(x >= template.ox && x < (template.ox + template.width) && y >= template.oy && y < (template.oy + template.height)) {
-					const idx = template.width * (y - template.oy) + (x - template.ox);
-					if(!advancedGriefCounter[template._id]) {
-						advancedGriefCounter[template._id] = [];
+					if(shouldBe != color) {
+						pixelData.isCorrect = false;
+						if(template.alertType === 'basic') {
+							setTimeout(function() { module.exports.checkBasic(template, client); }, basicDelay);
+						}
+					} else {
+						pixelData.isCorrect = true;
 					}
-
-					const board = pxls.board();
-					const griefData = {
-						x: x,
-						y: y,
-						color: color,
-						oldColor: oldBoard[board.bitmap.width * y + x],
-						shouldBe: template.source[idx],
-						timestamp: Date.now(),
-						alerted: false,
-					};
-					if(template.source[idx] != color && template.source[idx] != 255 && color != 255) {
-						advancedGriefCounter[template._id].push(griefData);
-					} else if(advancedGriefCounter[template._id].some(e => e.x === x && e.y === y)) {
-						advancedGriefCounter[template._id].push(griefData);
-					}
+					pixels.push(pixelData);
 				}
 			});
 		}
 	},
-	clearExpiredPixels(delay) {
-		for (const id in basicGriefCounter) {
-			for(let i = 0; i < basicGriefCounter[id].length; i++) {
-				if(Date.now() - basicGriefCounter[id][i].timestamp >= 6000 * 2) {
-					basicGriefCounter[id][i];
-					basicGriefCounter[id].splice(i, 1);
+	async checkBasic(template, client) {
+		const templatePixels = pixels.filter(pixel => pixel.template._id.toString() === template._id.toString());
+		if(templatePixels.length === 0) return;
+
+		const templateGriefs = module.exports.parseTemplatePixels(templatePixels, basicDelay);
+		if(templatePixels.length === 0) return;
+		const percentageComplete = await module.exports.getPercentageComplete(template);
+		const centerPixel = module.exports.getCenterFromGriefs(templateGriefs);
+		const preview = await module.exports.getPreviewFromGriefs(templateGriefs);
+		if(!preview) return;
+		const embedContent = module.exports.createEmbedContent(templateGriefs);
+
+		const embed = new Discord.MessageEmbed()
+			.setColor(process.env.BOT_COLOR)
+			.setTitle(':warning: Grief Alert!')
+			.setAuthor(`${template.title} (${percentageComplete})`)
+			.setDescription(embedContent)
+			.setImage('attachment://grief.png');
+
+		const row = new Discord.MessageActionRow()
+			.addComponents(
+				new Discord.MessageButton()
+					.setURL(module.exports.generatePxlsURL(template, centerPixel.x, centerPixel.y))
+					.setLabel('Template Link!')
+					.setStyle('LINK'),
+			);
+		client.channels.cache.get(template.alertChannel).send({
+			embeds:[embed],
+			files: [{
+				attachment: preview,
+				name: 'grief.png',
+			}],
+			components: [row],
+		});
+	},
+	async checkAdvanced(client, delay) {
+		const templates = await database.listTemplates({
+			canvasCode: pxls.info().canvasCode,
+			alert: true,
+			alertType: 'advanced',
+		});
+
+		templates.forEach(async template => {
+			const templatePixels = pixels.filter(pixel => pixel.template._id.toString() === template._id.toString());
+			if(templatePixels.length === 0) return;
+
+			const correctPixels = templatePixels.filter(pixel => pixel.isCorrect);
+			const griefedPixels = templatePixels.filter(pixel => !pixel.isCorrect);
+			let helpingUsers = Math.round(correctPixels.length / ((60 * delay) / pxls.cooldown(await pxls.users())));
+			let griefingUsers = Math.round(griefedPixels.length / ((60 * delay) / pxls.cooldown(await pxls.users())));
+			if(helpingUsers === 0 && correctPixels.length != 0) helpingUsers = 1;
+			if(griefingUsers === 0 && griefedPixels.length != 0) griefingUsers = 1;
+
+			const templateGriefs = module.exports.parseTemplatePixels(templatePixels, basicDelay);
+			if(templatePixels.length === 0) return;
+			const percentageComplete = await module.exports.getPercentageComplete(template);
+			const centerPixel = module.exports.getCenterFromGriefs(templateGriefs);
+			const preview = await module.exports.getPreviewFromGriefs(templateGriefs);
+			if(!preview) return;
+			let embedContent = module.exports.createEmbedContent(templateGriefs);
+
+			if(griefingUsers > helpingUsers) {
+				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nThe griefers have been estimated to outnumber you by **${griefingUsers - helpingUsers}** user(s)!\n\n` + embedContent;
+			} else if(helpingUsers > griefingUsers) {
+				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nYou have been estimated to outnumber the griefers by **${helpingUsers - griefingUsers}** user(s)!\n\n` + embedContent;
+			} else {
+				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nBoth you and the griefers have been estimated to have the same amount of users!\n\n` + embedContent;
+			}
+
+			const embed = new Discord.MessageEmbed()
+				.setColor(process.env.BOT_COLOR)
+				.setTitle(':warning: Grief Alert!')
+				.setAuthor(`${template.title} (${percentageComplete})`)
+				.setDescription(embedContent)
+				.setImage('attachment://grief.png');
+
+			const row = new Discord.MessageActionRow()
+				.addComponents(
+					new Discord.MessageButton()
+						.setURL(module.exports.generatePxlsURL(template, centerPixel.x, centerPixel.y))
+						.setLabel('Template Link!')
+						.setStyle('LINK'),
+				);
+			client.channels.cache.get(template.alertChannel).send({
+				embeds:[embed],
+				files: [{
+					attachment: preview,
+					name: 'grief.png',
+				}],
+				components: [row],
+			});
+		});
+		module.exports.clearExpiredPixels(false);
+	},
+	parseTemplatePixels(templatePixels, delay) {
+		const parsedTemplatePixels = [];
+
+		for(let i = 0; i < templatePixels.length; i++) {
+			if(!templatePixels[i].parsed) {
+				if(Date.now() - templatePixels[templatePixels.length - 1].timestamp >= delay || Date.now() - templatePixels[0].timestamp >= 60 * 1000) {
+					const pixelHistory = templatePixels.filter(pixel => pixel.x === templatePixels[i].x && pixel.y === templatePixels[i].y && Date.now() - templatePixels[templatePixels.length - 1].timestamp >= delay);
+					if(pixelHistory.length === 0) continue;
+					for(let j = 0; j < pixelHistory.length; j++) {
+						if(pixelHistory.indexOf(pixelHistory[j]) === pixelHistory.length - 1) {
+							pixelHistory[j].parsed = true;
+							const oldestPixel = pixelHistory[0];
+							const newestPixel = pixelHistory[pixelHistory.length - 1];
+							if(oldestPixel.oldColor === newestPixel.color) continue;
+							if(newestPixel.color === newestPixel.shouldBe) continue;
+							parsedTemplatePixels.push(newestPixel);
+						}
+					}
 				}
 			}
 		}
-		for (const id in advancedGriefCounter) {
-			for(let i = 0; i < advancedGriefCounter[id].length; i++) {
-				if(Date.now() - advancedGriefCounter[id][i].timestamp >= delay * 60 * 1000 * 2) {
-					advancedGriefCounter[id][i];
-					advancedGriefCounter[id].splice(i, 1);
-				}
+		return parsedTemplatePixels;
+	},
+	async getPercentageComplete(template) {
+		const actual = await canvas.board(template.ox, template.oy, template.width, template.height);
+		const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
+		const diffImage = await canvas.diffImages(templateSource, actual);
+
+		return diffImage.percentageComplete + '%';
+	},
+	getFramingFromGriefs(templateGriefs) {
+		const framing = {
+			left: pxls.info().width,
+			right: 0,
+			top: pxls.info().height,
+			bottom: 0,
+		};
+
+		for(let i = 0; i < templateGriefs.length; i++) {
+			const grief = templateGriefs[i];
+			if(grief.x < framing.left) framing.left = grief.x;
+			if(grief.x > framing.right) framing.right = grief.x;
+			if(grief.y < framing.top) framing.top = grief.y;
+			if(grief.y > framing.bottom) framing.bottom = grief.y;
+		}
+
+		return framing;
+	},
+	getCenterFromGriefs(templateGriefs) {
+		const center = {};
+
+		const framing = module.exports.getFramingFromGriefs(templateGriefs);
+
+		if(framing.left <= framing.right && framing.top <= framing.bottom) {
+			center.x = Math.round((framing.left + framing.right) / 2);
+			center.y = Math.round((framing.top + framing.bottom) / 2);
+		}
+
+		return center;
+	},
+	async getPreviewFromGriefs(templateGriefs) {
+		let preview;
+
+		const framing = module.exports.getFramingFromGriefs(templateGriefs);
+
+		if(framing.left <= framing.right && framing.top <= framing.bottom) {
+			preview = await canvas.griefPreview(framing);
+		}
+
+		return preview;
+	},
+	createEmbedContent(templateGriefs) {
+		const palette = pxls.info().palette;
+
+		let embedContent = '';
+
+		for(let i = 0; i < templateGriefs.length; i++) {
+			const grief = templateGriefs[i];
+			if(i < 5) {
+				embedContent += `Pixel placed at [(${grief.x}, ${grief.y})](${module.exports.generatePxlsURL(grief.template, grief.x, grief.y)}) is ${palette[grief.color].name} (${grief.color}), should be ${palette[grief.shouldBe].name} (${grief.shouldBe}).\n`;
+			} else if(i === 5) {
+				embedContent += `and ${templateGriefs.length - 5} more...`;
 			}
+		}
+
+		return embedContent.trim();
+	},
+	generatePxlsURL(template, x, y) {
+		return `${process.env.PXLS_URL}#template=${template.image}&tw=${template.width}&oo=1&ox=${template.ox}&oy=${template.oy}&x=${x}&y=${y}&scale=50&title=${encodeURIComponent(template.title)}`;
+	},
+	clearExpiredPixels(basic) {
+		let expiredPixels;
+		if(basic) {
+			expiredPixels = pixels.filter(pixel => pixel.template.alertType === 'basic' && Date.now() - pixel.timestamp >= basicDelay * 2);
+		} else {
+			expiredPixels = pixels.filter(pixel => pixel.template.alertType === 'advanced' && Date.now() - pixel.timestamp >= basicDelay * 2);
+		}
+		for(let i = 0; i < expiredPixels.length; i++) {
+			pixels.splice(pixels.indexOf(expiredPixels[i]), 1);
 		}
 	},
 };

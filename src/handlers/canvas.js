@@ -331,8 +331,6 @@ module.exports = {
 		return layered.getBufferAsync(Jimp.MIME_PNG);
 	},
 	async griefPreview(framing) {
-		const board = pxls.board();
-
 		framing.left = framing.left - 5;
 		framing.right = framing.right + 6;
 		framing.top = framing.top - 5;
@@ -340,8 +338,8 @@ module.exports = {
 
 		if(framing.left < 0) framing.left = 0;
 		if(framing.top < 0) framing.top = 0;
-		if(framing.right > board.bitmap.width - 1) framing.right = board.bitmap.width - 1;
-		if(framing.bottom > board.bitmap.height - 1) framing.bottom = board.bitmap.height - 1;
+		if(framing.right > pxls.info().width - 1) framing.right = pxls.info().width - 1;
+		if(framing.bottom > pxls.info().height - 1) framing.bottom = pxls.info().height - 1;
 
 		const x = framing.left;
 		const y = framing.top;
