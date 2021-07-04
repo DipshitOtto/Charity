@@ -108,15 +108,26 @@ module.exports = {
 			const centerPixel = module.exports.getCenterFromGriefs(templateGriefs);
 			const preview = await module.exports.getPreviewFromGriefs(templateGriefs);
 			if(!preview) return;
-			let embedContent = module.exports.createEmbedContent(templateGriefs);
+			const pixelEmbedContent = module.exports.createEmbedContent(templateGriefs);
+			let embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\n`;
 
 			if(griefingUsers > helpingUsers) {
-				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nThe griefers have been estimated to outnumber you by **${griefingUsers - helpingUsers}** user(s)!\n\n` + embedContent;
+				embedContent += `The griefers have been estimated to outnumber you by **${griefingUsers - helpingUsers}** user(s)!\n`;
 			} else if(helpingUsers > griefingUsers) {
-				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nYou have been estimated to outnumber the griefers by **${helpingUsers - griefingUsers}** user(s)!\n\n` + embedContent;
+				embedContent = `You have been estimated to outnumber the griefers by **${helpingUsers - griefingUsers}** user(s)!\n`;
 			} else {
-				embedContent = `Roughly **${griefingUsers}** user(s) worth of force has been detected on ${template.title} in the past ${delay} minutes!\nBoth you and the griefers have been estimated to have the same amount of users!\n\n` + embedContent;
+				embedContent = 'Both you and the griefers have been estimated to have the same amount of users!\n';
 			}
+
+			if(griefedPixels.length > correctPixels.length) {
+				embedContent += `The griefers have placed **${griefedPixels.length - correctPixels.length}** more pixels than you!\n`;
+			} else if(correctPixels.length > griefedPixels.length) {
+				embedContent += `You have placed **${correctPixels.length - griefedPixels.length}** more pixels than the griefers!\n`;
+			} else {
+				embedContent += 'You have placed the same amount of pixels as the griefers!\n';
+			}
+
+			embedContent += `\n${pixelEmbedContent}`;
 
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
