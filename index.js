@@ -103,7 +103,7 @@ client.on('interaction', async interaction => {
 
 	if (!command) return;
 
-	if (command.guildOnly && !interaction.guildID) {
+	if (command.guildOnly && !interaction.guildId) {
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setDescription(':x: I can\'t execute that command inside DMs!');
