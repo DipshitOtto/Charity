@@ -188,15 +188,13 @@ module.exports = {
 		},
 	],
 	async template(interaction, subcommand) {
-		const command = subcommand.options.values().next().value;
-		const args = command.options;
-
-		if (command.name === 'view') {
-			const name = args.get('name');
+		subcommand = subcommand.find(option => option.name === interaction.options.getSubcommand());
+		if (subcommand.name === 'view') {
+			const name = subcommand.options.find(arg => arg.name === 'name');
 
 			const template = await database.getTemplate({
 				name: name.value,
-				gid: interaction.guildID,
+				gid: interaction.guildId,
 			});
 			if (template == null) {
 				const embed = new Discord.MessageEmbed()
@@ -223,14 +221,14 @@ module.exports = {
 
 				return await interaction.editReply({ embeds: [embed] });
 			}
-		} else if (command.name === 'add') {
-			const name = args.get('name');
-			const link = args.get('link');
+		} else if (subcommand.name === 'add') {
+			const name = subcommand.options.find(arg => arg.name === 'name');
+			const link = subcommand.options.find(arg => arg.name === 'link');
 
 			if (!!link.value.match(/[#&?]title=.*?(&|$)/g) && !!link.value.match(/[#&?]template=.*?(&|$)/g) && !!link.value.match(/[#&?]ox=.*?(&|$)/g) && !!link.value.match(/[#&?]oy=.*?(&|$)/g) && !!link.value.match(/[#&?]tw=.*?(&|$)/g)) {
 				const data = {
 					canvasCode: pxls.info().canvasCode,
-					gid: interaction.guildID,
+					gid: interaction.guildId,
 					name: name.value,
 					hidden: false,
 					title: decodeURIComponent(link.value.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g)),
@@ -253,11 +251,11 @@ module.exports = {
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 
-				await database.addTemplate(name.value, interaction.guildID, data);
+				await database.addTemplate(name.value, interaction.guildId, data);
 
 				const template = await database.getTemplate({
 					name: name.value,
-					gid: interaction.guildID,
+					gid: interaction.guildId,
 				});
 
 				if (template === null) {
@@ -406,10 +404,10 @@ module.exports = {
 					embeds: [embed.toJSON()],
 				});
 			}*/
-		} else if (command.name === 'remove') {
-			const name = args.get('name');
+		} else if (subcommand.name === 'remove') {
+			const name = subcommand.options.find(arg => arg.name === 'name');
 
-			const result = await database.removeTemplate(name.value, interaction.guildID);
+			const result = await database.removeTemplate(name.value, interaction.guildId);
 			if (result.deletedCount > 0) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
@@ -423,9 +421,9 @@ module.exports = {
 
 				return await interaction.editReply({ embeds: [embed] });
 			}
-		} else if (command.name === 'update') {
-			const name = args.get('name');
-			const link = args.get('link');
+		} else if (subcommand.name === 'update') {
+			const name = subcommand.options.find(arg => arg.name === 'name');
+			const link = subcommand.options.find(arg => arg.name === 'link');
 
 			if (!!link.value.match(/[#&?]title=.*?(&|$)/g) && !!link.value.match(/[#&?]template=.*?(&|$)/g) && !!link.value.match(/[#&?]ox=.*?(&|$)/g) && !!link.value.match(/[#&?]oy=.*?(&|$)/g) && !!link.value.match(/[#&?]tw=.*?(&|$)/g)) {
 				const data = {
@@ -443,11 +441,11 @@ module.exports = {
 				data.height = await canvas.height(image.data, data.scaleFactor);
 				data.source = await canvas.templateSource(await canvas.detemplatize(image.data, data.width, data.height, data.scaleFactor), pxls.info().palette);
 
-				await database.editTemplate(name.value, interaction.guildID, data);
+				await database.editTemplate(name.value, interaction.guildId, data);
 
 				const template = await database.getTemplate({
 					name: name.value,
-					gid: interaction.guildID,
+					gid: interaction.guildId,
 				});
 
 				if (template == null) {
@@ -475,8 +473,8 @@ module.exports = {
 					return await interaction.editReply({ embeds: [embed] });
 				}
 			}
-		} else if (command.name === 'list') {
-			const templates = await database.listTemplates({ gid: interaction.guildID });
+		} else if (subcommand.name === 'list') {
+			const templates = await database.listTemplates({ gid: interaction.guildId });
 
 			const results = [];
 
@@ -495,15 +493,14 @@ module.exports = {
 		}
 	},
 	async alert(interaction, subcommand, client) {
-		const command = subcommand.options.values().next().value;
-		const args = command.options;
+		subcommand = subcommand.find(option => option.name === interaction.options.getSubcommand());
 
-		if (command.name === 'add') {
-			const type = args.get('type');
-			const name = args.get('name');
-			const channelID = args.get('channel');
-			const threshold = args.get('threshold');
-			const role = args.get('role');
+		if (subcommand.name === 'add') {
+			const type = subcommand.options.find(arg => arg.name === 'type');
+			const name = subcommand.options.find(arg => arg.name === 'name');
+			const channel = subcommand.options.find(arg => arg.name === 'channel');
+			const threshold = subcommand.options.find(arg => arg.name === 'threshold');
+			const role = subcommand.options.find(arg => arg.name === 'role');
 
 			if (type.value === 'advanced' && (!threshold || !role)) {
 				const embed = new Discord.MessageEmbed()
@@ -513,7 +510,7 @@ module.exports = {
 				return await interaction.editReply({ embeds: [embed] });
 			}
 
-			if (client.channels.cache.get(channelID.value).type != 'text') {
+			if (channel.channel.type != 'GUILD_TEXT') {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setDescription(':x: Grief alert channels must be guild text channels!');
@@ -523,7 +520,7 @@ module.exports = {
 
 			const template = await database.getTemplate({
 				name: name.value,
-				gid: interaction.guildID,
+				gid: interaction.guildId,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if(!template) {
@@ -535,10 +532,10 @@ module.exports = {
 			}
 
 			if (type.value === 'basic') {
-				await database.editTemplate(name.value, interaction.guildID, {
+				await database.editTemplate(name.value, interaction.guildId, {
 					alert: true,
 					alertType: 'basic',
-					alertChannel: channelID.value,
+					alertChannel: channel.value,
 				});
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
@@ -546,10 +543,10 @@ module.exports = {
 					.setDescription(`:white_check_mark: Added basic grief alert to ${name.value}!`);
 				return await interaction.editReply({ embeds: [embed] });
 			} else if (type.value === 'advanced') {
-				await database.editTemplate(name.value, interaction.guildID, {
+				await database.editTemplate(name.value, interaction.guildId, {
 					alert: true,
 					alertType: 'advanced',
-					alertChannel: channelID.value,
+					alertChannel: channel.value,
 					alertThreshold: threshold.value,
 					alertRole: role.value,
 				});
@@ -559,12 +556,12 @@ module.exports = {
 					.setDescription(`:white_check_mark: Added advanced grief alert to ${name.value}!`);
 				return await interaction.editReply({ embeds: [embed] });
 			}
-		} else if (command.name === 'remove') {
-			const name = args.get('name');
+		} else if (subcommand.name === 'remove') {
+			const name = subcommand.options.find(arg => arg.name === 'name');
 
 			const template = await database.getTemplate({
 				name: name.value,
-				gid: interaction.guildID,
+				gid: interaction.guildId,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if(!template) {
@@ -575,15 +572,15 @@ module.exports = {
 				return await interaction.editReply({ embeds: [embed] });
 			}
 
-			await database.editTemplate(name.value, interaction.guildID, { alert: false });
+			await database.editTemplate(name.value, interaction.guildId, { alert: false });
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('Templates:')
 				.setDescription(`:white_check_mark: Removed grief alert from ${name.value}!`);
 			return await interaction.editReply({ embeds: [embed] });
-		} else if (command.name === 'list') {
+		} else if (subcommand.name === 'list') {
 			const templates = await database.listTemplates({
-				gid: interaction.guildID,
+				gid: interaction.guildId,
 				canvasCode: pxls.info().canvasCode,
 				alert: true,
 			});
@@ -607,14 +604,14 @@ module.exports = {
 	async execute(interaction, client) {
 		await interaction.defer();
 
-		const authorPerms = interaction.member.permissionsIn(interaction.channelID);
+		const authorPerms = interaction.member.permissionsIn(interaction.channelId);
 		if (!client.application?.owner) await client.application?.fetch();
 		if (interaction.user.id === client.application?.owner.id || authorPerms.has('BAN_MEMBERS') || authorPerms.has('MANAGE_GUILD')) {
-			const subcommand = interaction.options.values().next().value;
-			if(subcommand.name === 'template') {
-				module.exports.template(interaction, subcommand, client);
-			} else if(subcommand.name === 'alert') {
-				module.exports.alert(interaction, subcommand, client);
+			const subcommandGroup = interaction.options.data.find(option => option.name === interaction.options.getSubcommandGroup());
+			if(subcommandGroup.name === 'template') {
+				module.exports.template(interaction, subcommandGroup.options, client);
+			} else if(subcommandGroup.name === 'alert') {
+				module.exports.alert(interaction, subcommandGroup.options, client);
 			}
 		} else {
 			const embed = new Discord.MessageEmbed()

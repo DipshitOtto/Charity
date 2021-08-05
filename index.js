@@ -26,7 +26,7 @@ client.once('ready', () => {
 });
 
 // Handle deploying, adding, and removing slash commands.
-client.on('message', async message => {
+client.on('messageCreate', async message => {
 	if (!client.application?.owner) await client.application?.fetch();
 	if (!message.content.startsWith(process.env.ADMIN_PREFIX) || message.author.id != client.application?.owner.id) return;
 
@@ -95,7 +95,7 @@ client.on('message', async message => {
 	}
 });
 
-client.on('interaction', async interaction => {
+client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 	interaction.timestamp = Date.now();
 
@@ -103,7 +103,7 @@ client.on('interaction', async interaction => {
 
 	if (!command) return;
 
-	if (command.guildOnly && !interaction.guildId) {
+	if (command.guildOnly && !interaction.inGuild()) {
 		const embed = new Discord.MessageEmbed()
 			.setColor(process.env.BOT_COLOR)
 			.setDescription(':x: I can\'t execute that command inside DMs!');

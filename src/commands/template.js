@@ -26,7 +26,7 @@ module.exports = {
 		const name = interaction.options.get('name');
 		const template = await database.getTemplate({
 			name: name.value,
-			gid: interaction.guildID,
+			gid: interaction.guildId,
 			canvasCode: pxls.info().canvasCode,
 		});
 		const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);

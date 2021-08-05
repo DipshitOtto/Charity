@@ -185,7 +185,7 @@ module.exports = {
 			} else {
 				const template = await database.getTemplate({
 					name: options[i].value,
-					gid: interaction.guildID,
+					gid: interaction.guildId,
 					canvasCode: pxls.info().canvasCode,
 				});
 				if(template && template.source) {

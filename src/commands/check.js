@@ -55,9 +55,9 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.defer();
 
-		const subcommand = interaction.options.values().next().value;
+		const subcommand = interaction.options.data.find(option => option.name === interaction.options.getSubcommand());
 		if (subcommand.name === 'list') {
-			const templates = await database.listTemplates({ gid: interaction.guildID, canvasCode: pxls.info().canvasCode });
+			const templates = await database.listTemplates({ gid: interaction.guildId, canvasCode: pxls.info().canvasCode });
 
 			const results = [];
 
@@ -74,12 +74,12 @@ module.exports = {
 
 			return await interaction.editReply({ embeds: [embed] });
 		} else if (subcommand.name === 'progress') {
-			const name = subcommand.options.get('name');
-			const display = subcommand.options.get('display');
+			const name = subcommand.options.find(option => option.name === 'name');
+			const display = subcommand.options.find(option => option.name === 'display');
 
 			const template = await database.getTemplate({
 				name: name.value,
-				gid: interaction.guildID,
+				gid: interaction.guildId,
 				canvasCode: pxls.info().canvasCode,
 			});
 			if (template == null) {
