@@ -25,6 +25,30 @@ client.once('ready', () => {
 	clock.init(client);
 });
 
+client.on('guildCreate', guild => {
+	const row = new Discord.MessageActionRow()
+		.addComponents(
+			new Discord.MessageButton()
+				.setURL(process.env.DISCORD_URL)
+				.setLabel('Join the Discord!')
+				.setStyle('LINK'),
+			new Discord.MessageButton()
+				.setURL(process.env.PATREON_URL)
+				.setLabel('Support Charity on Patreon!')
+				.setStyle('LINK'),
+		);
+	const embed = new Discord.MessageEmbed()
+		.setColor(process.env.BOT_COLOR)
+		.setTitle(':wave: Hi! I\'m Charity!')
+		.setDescription('Charity is a discord bot that allows pxls.space factions and users to get information about Pxls, check progress on their templates, get alerted when their templates get griefed, and much, much more!\n\nYou can add templates to Charity with the `/manage template add` command.\n\nMake sure to check out the options below for more details!');
+	if (guild.publicUpdatesChannel) {
+		guild.publicUpdatesChannel.send({ embeds: [embed], components: [row] });
+	} else {
+		const channel = guild.channels.cache.find(chnl => chnl.type === 'GUILD_TEXT' && chnl.permissionsFor(guild.me).has('SEND_MESSAGES'));
+		channel.send({ embeds: [embed], components: [row] });
+	}
+});
+
 // Handle deploying, adding, and removing slash commands.
 client.on('messageCreate', async message => {
 	if (!client.application?.owner) await client.application?.fetch();
@@ -38,7 +62,7 @@ client.on('messageCreate', async message => {
 
 		for (const file of commandFiles) {
 			const commandFile = require(`./src/commands/${file}`);
-			if(commandFile.options) {
+			if (commandFile.options) {
 				data.push({
 					'name': commandFile.name,
 					'description': commandFile.description,
@@ -96,6 +120,26 @@ client.on('messageCreate', async message => {
 });
 
 client.on('interactionCreate', async interaction => {
+	if (interaction.isSelectMenu()) {
+		if (interaction.message.type === 'APPLICATION_COMMAND') {
+			const command = client.commands.get(interaction.message.interaction.commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(interaction.message.interaction.commandName));
+			try {
+				command.select(interaction);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	}
+	if (interaction.isButton()) {
+		if (interaction.message.type === 'APPLICATION_COMMAND') {
+			const command = client.commands.get(interaction.message.interaction.commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(interaction.message.interaction.commandName));
+			try {
+				command.button(interaction);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	}
 	if (!interaction.isCommand()) return;
 	interaction.timestamp = Date.now();
 

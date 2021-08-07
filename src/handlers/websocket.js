@@ -28,12 +28,12 @@ module.exports = {
 				if (message.type === 'utf8') {
 					const data = JSON.parse(message.utf8Data);
 					try {
-						if(data.type === 'pixel') {
+						if (data.type === 'pixel') {
 							await alert.checkPixel(pxls.boardPalette(), data, client);
 							pxls.updateBoard(data);
 						}
 					} catch (error) {
-						if(data.type === 'pixel') {
+						if (data.type === 'pixel') {
 							pxls.updateFailedBoardPixels(data);
 						} else {
 							console.error(error);

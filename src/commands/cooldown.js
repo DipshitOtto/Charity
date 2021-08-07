@@ -18,10 +18,10 @@ module.exports = {
 		},
 	],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		let users = interaction.options.get('users');
-		if(!users) {
+		if (!users) {
 			users = await pxls.users();
 		} else {
 			users = users.value;
@@ -39,7 +39,7 @@ module.exports = {
 			return minutes + ':' + seconds;
 		}
 
-		if(users > 1386) {
+		if (users > 1386) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: Users cannot exceed 1386!');
@@ -49,7 +49,7 @@ module.exports = {
 
 		let response = '';
 
-		for(let i = 0; i < 6; i++) {
+		for (let i = 0; i < 6; i++) {
 			response += `${i}/6 -> ${i + 1}/6 = ${format(pxls.cooldownMultiplier(cooldown, i))}\n`;
 		}
 

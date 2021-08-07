@@ -21,7 +21,7 @@ module.exports = {
 		},
 	],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const link = interaction.options.get('link');
 

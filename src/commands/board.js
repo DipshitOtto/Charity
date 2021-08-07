@@ -12,7 +12,7 @@ module.exports = {
 	cooldown: 10,
 	options: [],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const board = await canvas.board();
 

@@ -32,8 +32,8 @@ module.exports = {
 
 			const index = boardData.data[board.bitmap.width * y + x];
 			boardPalette.push(index);
-			if(red === 0 && green === 0 && blue === 0 && alpha === 0) {
-				if(index === 255) return;
+			if (red === 0 && green === 0 && blue === 0 && alpha === 0) {
+				if (index === 255) return;
 				const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
 				board.bitmap.data[idx] = parseInt(color[1], 16);
 				board.bitmap.data[idx + 1] = parseInt(color[2], 16);
@@ -41,7 +41,7 @@ module.exports = {
 				board.bitmap.data[idx + 3] = 255;
 			}
 		});
-		for(let i = 0; i < failedPixels.length; i++) {
+		for (let i = 0; i < failedPixels.length; i++) {
 			const x = failedPixels[i].x;
 			const y = failedPixels[i].y;
 
@@ -49,7 +49,7 @@ module.exports = {
 
 			const index = failedPixels[i].color;
 			boardPalette[board.bitmap.width * y + x] = index;
-			if(index === 255) return;
+			if (index === 255) return;
 			const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
 			board.bitmap.data[idx] = parseInt(color[1], 16);
 			board.bitmap.data[idx + 1] = parseInt(color[2], 16);
@@ -60,7 +60,7 @@ module.exports = {
 		console.log('Board Initialized!');
 	},
 	updateBoard(data) {
-		for(let i = 0; i < data.pixels.length; i++) {
+		for (let i = 0; i < data.pixels.length; i++) {
 			const x = data.pixels[i].x;
 			const y = data.pixels[i].y;
 
@@ -68,7 +68,7 @@ module.exports = {
 
 			const index = data.pixels[i].color;
 			boardPalette[board.bitmap.width * y + x] = index;
-			if(index === 255) return;
+			if (index === 255) return;
 			const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(info.data.palette[index].value);
 			board.bitmap.data[idx] = parseInt(color[1], 16);
 			board.bitmap.data[idx + 1] = parseInt(color[2], 16);
@@ -77,7 +77,7 @@ module.exports = {
 		}
 	},
 	updateFailedBoardPixels(data) {
-		for(let i = 0; i < data.pixels.length; i++) {
+		for (let i = 0; i < data.pixels.length; i++) {
 			failedPixels.push(data.pixels[i]);
 		}
 	},
@@ -103,7 +103,7 @@ module.exports = {
 	cooldownMultiplier(cooldown, stack) {
 		function sum_up_to_n(n) {
 			let r = 0;
-			for(let i = 0; i < n; i++) {
+			for (let i = 0; i < n; i++) {
 				r += i;
 			}
 			return r;

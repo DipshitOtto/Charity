@@ -37,7 +37,7 @@ module.exports = {
 						.setURL(`https://discord.com/oauth2/authorize?client_id=${process.env.APP_ID}&scope=applications.commands%20bot&permissions=${process.env.INVITE_PERMS}`)
 						.setLabel('Invite Charity to your Faction!')
 						.setStyle('LINK'),
-						new Discord.MessageButton()
+					new Discord.MessageButton()
 						.setURL(process.env.PATREON_URL)
 						.setLabel('Support Charity on Patreon!')
 						.setStyle('LINK'),
@@ -49,19 +49,19 @@ module.exports = {
 				.setThumbnail('attachment://profile.png');
 
 			if (!argument) {
-				for(const command of commands) {
+				for (const command of commands) {
 					let usage = '';
 					for (let i = 0; i < command[1].options.length; i++) {
-						if(i < 2) {
-							if(command[1].options[i].type === 'SUB_COMMAND' || command[1].options[i].type === 'SUB_COMMAND_GROUP') {
-								if(i === 0) {
+						if (i < 2) {
+							if (command[1].options[i].type === 'SUB_COMMAND' || command[1].options[i].type === 'SUB_COMMAND_GROUP') {
+								if (i === 0) {
 									usage += ` {${command[1].options[i].name}`;
 								} else if (i === command[1].options.length - 1) {
 									usage += `|${command[1].options[i].name}}`;
 								} else {
 									usage += `|${command[1].options[i].name}`;
 								}
-							} else if(command[1].options[i].required) {
+							} else if (command[1].options[i].required) {
 								usage += ` <${command[1].options[i].name}>`;
 							} else {
 								usage += ` [${command[1].options[i].name}]`;
@@ -102,31 +102,31 @@ module.exports = {
 			if (command.aliases && command.aliases.length > 0) data.push(`**Aliases:** \`/${command.aliases.join('`, `/')}\``);
 			if (command.description) data.push(`**Description:** ${command.description}`);
 
-			if(command.options.length) {
+			if (command.options.length) {
 				let usage = `**Usage:** \n\`/${command.name}`;
 				for (let i = 0; i < command.options.length; i++) {
-					if(command.options[i].type === 'SUB_COMMAND') {
+					if (command.options[i].type === 'SUB_COMMAND') {
 						(i === 0) ? usage += ` ${command.options[i].name}` : usage += `\`\n\`/${command.name} ${command.options[i].name}`;
 						for (let j = 0; j < command.options[i].options.length; j++) {
-							if(command.options[i].options[j].required) {
+							if (command.options[i].options[j].required) {
 								usage += ` <${command.options[i].options[j].name}>`;
 							} else {
 								usage += ` [${command.options[i].options[j].name}]`;
 							}
 						}
-					} else if(command.options[i].type === 'SUB_COMMAND_GROUP') {
+					} else if (command.options[i].type === 'SUB_COMMAND_GROUP') {
 						for (let j = 0; j < command.options[i].options.length; j++) {
 							(j === 0) ? usage += ` ${command.options[i].name}` : usage += `\`\n\`/${command.name} ${command.options[i].name}`;
 							usage += ` ${command.options[i].options[j].name}`;
 							for (let k = 0; k < command.options[i].options[j].options.length; k++) {
-								if(command.options[i].options[j].options[k].required) {
+								if (command.options[i].options[j].options[k].required) {
 									usage += ` <${command.options[i].options[j].options[k].name}>`;
 								} else {
 									usage += ` [${command.options[i].options[j].options[k].name}]`;
 								}
 							}
 						}
-					} else if(command.options[i].required) {
+					} else if (command.options[i].required) {
 						usage += ` <${command.options[i].name}>`;
 					} else {
 						usage += ` [${command.options[i].name}]`;

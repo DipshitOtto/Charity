@@ -18,13 +18,13 @@ module.exports = {
 		},
 	],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const color = interaction.options.get('color');
 
 		const buffer = await canvas.color(color.value);
 
-		if(!buffer) {
+		if (!buffer) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setDescription(':x: That color doesn\'t exist!');

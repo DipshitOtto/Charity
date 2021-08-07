@@ -11,7 +11,7 @@ module.exports = {
 	cooldown: 3,
 	options: [],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const users = await pxls.users();
 

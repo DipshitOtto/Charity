@@ -165,13 +165,13 @@ module.exports = {
 		},
 	],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const templates = [];
 
-		const options = Array.from(interaction.options.values());
+		const options = Array.from(interaction.options.data);
 
-		for(let i = 0; i < options.length; i++) {
+		for (let i = 0; i < options.length; i++) {
 			if (!!options[i].value.match(/[#&?]template=.*?(&|$)/g) && !!options[i].value.match(/[#&?]ox=.*?(&|$)/g) && !!options[i].value.match(/[#&?]oy=.*?(&|$)/g) && !!options[i].value.match(/[#&?]tw=.*?(&|$)/g)) {
 				const template = decodeURIComponent(options[i].value.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
 				const image = await axios.get(template, { responseType: 'arraybuffer' });
@@ -188,7 +188,7 @@ module.exports = {
 					gid: interaction.guildId,
 					canvasCode: pxls.info().canvasCode,
 				});
-				if(template && template.source) {
+				if (template && template.source) {
 					const templateSource = await canvas.parsePalette(template.source, pxls.info().palette, template.width, template.height);
 					templates.push({
 						image: templateSource,
@@ -198,7 +198,7 @@ module.exports = {
 					});
 				} else {
 					const embed = new Discord.MessageEmbed();
-					if(options[i].value.match(/[#&?]title=.*?(&|$)/g)) {
+					if (options[i].value.match(/[#&?]title=.*?(&|$)/g)) {
 						embed.setColor(process.env.BOT_COLOR)
 							.setDescription(`:x: Template ${decodeURIComponent(options[i].value.match(/(?<=[#&?]title=)(.*?)(?=&|$)/g))} does not exist!`);
 					} else {

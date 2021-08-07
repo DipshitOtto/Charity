@@ -23,7 +23,7 @@ module.exports = {
 		const templateLink = interaction.options.get('link');
 
 		if (!!templateLink.value.match(/[#&?]template=.*?(&|$)/g) && !!templateLink.value.match(/[#&?]tw=.*?(&|$)/g)) {
-			await interaction.defer();
+			if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 			const template = decodeURIComponent(templateLink.value.match(/(?<=[#&?]template=)(.*?)(?=&|$)/g));
 			const width = parseInt(decodeURIComponent(templateLink.value.match(/(?<=[#&?]tw=)(.*?)(?=&|$)/g)));

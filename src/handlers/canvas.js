@@ -8,7 +8,7 @@ const Jimp = require('jimp');
 module.exports = {
 	async board(x = 0, y = 0, width, height) {
 		const board = pxls.board();
-		if((x === undefined || x === null) && (y === undefined || y === null) && (width === undefined || width === null) && (height === undefined || height === null)) {
+		if ((x === undefined || x === null) && (y === undefined || y === null) && (width === undefined || width === null) && (height === undefined || height === null)) {
 			return board.getBufferAsync(Jimp.MIME_PNG);
 		}
 		if (width === undefined || width === null) width = board.bitmap.width;
@@ -79,11 +79,11 @@ module.exports = {
 						for (let py = y * scaleFactor; py < y * scaleFactor + scaleFactor; py++) {
 							if (color === null) {
 								let pixelColor = '0x' + (image.getPixelColor(px, py) >>> 0).toString(16).padStart(8, '0');
-								if(x == 0 && y == 0) {
+								if (x == 0 && y == 0) {
 									const a = parseInt('0x' + pixelColor.substring(8));
 									pixelColor = pixelColor.substring(0, pixelColor.length - 2) + (a < 128 ? 0 : 255).toString(16).padStart(2, '0');
 								}
-								if(pixelColor.slice(pixelColor.length - 2) != '00') {
+								if (pixelColor.slice(pixelColor.length - 2) != '00') {
 									color = parseInt(pixelColor.substring(pixelColor.length - 2, 0) + 'ff');
 								} else {
 									color = null;
@@ -101,7 +101,7 @@ module.exports = {
 		const generated = await new Jimp(width, height);
 		generated.scan(0, 0, width, height, function(x, y, idx) {
 			const index = array[generated.bitmap.width * y + x];
-			if(index === 255) return;
+			if (index === 255) return;
 			const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(palette[index].value);
 			generated.bitmap.data[idx] = parseInt(color[1], 16);
 			generated.bitmap.data[idx + 1] = parseInt(color[2], 16);
@@ -225,21 +225,21 @@ module.exports = {
 		return generated;
 	},
 	async color(color) {
-		if(color.match(/^[a-fA-F0-9]{3}$/g)) {
+		if (color.match(/^[a-fA-F0-9]{3}$/g)) {
 			color = ('#' + color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2)).toUpperCase();
-		} else if(color.match(/^#[a-fA-F0-9]{3}$/g)) {
+		} else if (color.match(/^#[a-fA-F0-9]{3}$/g)) {
 			color = ('#' + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3)).toUpperCase();
-		} else if(color.match(/^[a-fA-F0-9]{6}$/g)) {
+		} else if (color.match(/^[a-fA-F0-9]{6}$/g)) {
 			color = ('#' + color.charAt(0) + color.charAt(1) + color.charAt(2) + color.charAt(3) + color.charAt(4) + color.charAt(5)).toUpperCase();
-		} else if(color.match(/^#[a-fA-F0-9]{6}$/g)) {
+		} else if (color.match(/^#[a-fA-F0-9]{6}$/g)) {
 			color = ('#' + color.charAt(1) + color.charAt(2) + color.charAt(3) + color.charAt(4) + color.charAt(5) + color.charAt(6)).toUpperCase();
-		} else if(color.match(/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$/g)) {
+		} else if (color.match(/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$/g)) {
 			color = ('#' + parseInt(color.split(',')[0]).toString(16) + parseInt(color.split(',')[1]).toString(16) + parseInt(color.split(',')[2]).toString(16)).toUpperCase();
 		} else {
 			const colors = fs.readFileSync('src/assets/colors.json');
 			const palette = JSON.parse(colors);
 			color = palette.find(c => {return c.name.toLowerCase() === color.toLowerCase();});
-			if(color) {
+			if (color) {
 				color = color.value;
 			} else {
 				return null;
@@ -315,15 +315,15 @@ module.exports = {
 		let maxX = 0;
 		let maxY = 0;
 
-		for(let i = templates.length - 1; i >= 0; i--) {
+		for (let i = templates.length - 1; i >= 0; i--) {
 			const croppedTemplate = await this.cropToBoard(await Jimp.read(templates[i].image), templates[i].ox, templates[i].oy);
 			layered.composite(croppedTemplate.image, croppedTemplate.ox, croppedTemplate.oy);
 			const height = croppedTemplate.image.bitmap.height;
 			const width = croppedTemplate.image.bitmap.width;
-			if(croppedTemplate.ox < minX) minX = croppedTemplate.ox;
-			if(croppedTemplate.oy < minY) minY = croppedTemplate.oy;
-			if((croppedTemplate.ox + width) > maxX) maxX = croppedTemplate.ox + width;
-			if((croppedTemplate.oy + height) > maxY) maxY = croppedTemplate.oy + height;
+			if (croppedTemplate.ox < minX) minX = croppedTemplate.ox;
+			if (croppedTemplate.oy < minY) minY = croppedTemplate.oy;
+			if ((croppedTemplate.ox + width) > maxX) maxX = croppedTemplate.ox + width;
+			if ((croppedTemplate.oy + height) > maxY) maxY = croppedTemplate.oy + height;
 		}
 
 		layered.crop(minX, minY, maxX - minX, maxY - minY);
@@ -336,10 +336,10 @@ module.exports = {
 		framing.top = framing.top - 5;
 		framing.bottom = framing.bottom + 6;
 
-		if(framing.left < 0) framing.left = 0;
-		if(framing.top < 0) framing.top = 0;
-		if(framing.right > pxls.info().width - 1) framing.right = pxls.info().width - 1;
-		if(framing.bottom > pxls.info().height - 1) framing.bottom = pxls.info().height - 1;
+		if (framing.left < 0) framing.left = 0;
+		if (framing.top < 0) framing.top = 0;
+		if (framing.right > pxls.info().width - 1) framing.right = pxls.info().width - 1;
+		if (framing.bottom > pxls.info().height - 1) framing.bottom = pxls.info().height - 1;
 
 		const x = framing.left;
 		const y = framing.top;
@@ -354,5 +354,55 @@ module.exports = {
 		});
 
 		return preview;
+	},
+	async managePreview(template, actual) {
+		template = await Jimp.read(template);
+		actual = await Jimp.read(actual);
+
+		actual.composite(template, 0, 0);
+
+		return actual.getBufferAsync(Jimp.MIME_PNG);
+	},
+	async getPercentageComplete(template) {
+		const boardPalette = pxls.boardPalette();
+		const width = pxls.info().width;
+		const height = pxls.info().height;
+
+		// use only negative offsets (and make them positive)
+		const putOffsetX = Math.max(-template.ox, 0);
+		const putOffsetY = Math.max(-template.oy, 0);
+
+		// use only positive offsets
+		const takeOffsetX = Math.max(template.ox, 0);
+		const takeOffsetY = Math.max(template.oy, 0);
+
+		const availableWidth = width - takeOffsetX;
+		const availableHeight = height - takeOffsetY;
+
+		const croppedDataWidth = Math.min(template.width - putOffsetX, availableWidth);
+		const croppedDataHeight = Math.min(template.height - putOffsetY, availableHeight);
+
+		const croppedBuffer = new Uint8Array(template.width * template.height);
+		croppedBuffer.fill(255);
+
+		for (let y = 0; y < croppedDataHeight; y++) {
+			const takeLocation = (y + takeOffsetY) * width + takeOffsetX;
+			const putLocation = (y + putOffsetY) * template.width + putOffsetX;
+			const row = boardPalette.slice(takeLocation, takeLocation + croppedDataWidth);
+			croppedBuffer.set(row, putLocation);
+		}
+
+		let correctPixels = 0;
+		let totalPixels = 0;
+
+		for (let i = 0; i < template.source.length; i++) {
+			if (template.source[i] != 255) {
+				if (template.source[i] === croppedBuffer[i]) {
+					correctPixels++;
+				}
+				totalPixels++;
+			}
+		}
+		return Math.round((correctPixels / totalPixels * 100 + Number.EPSILON) * 100) / 100;
 	},
 };

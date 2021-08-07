@@ -21,7 +21,7 @@ module.exports = {
 		},
 	],
 	async execute(interaction) {
-		await interaction.defer();
+		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
 		const name = interaction.options.get('name');
 		const template = await database.getTemplate({
