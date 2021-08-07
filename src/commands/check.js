@@ -98,8 +98,8 @@ module.exports = {
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:');
 
-				for (let j = 0; j < 3; j++) {
-					if (results[(i * 3) + j]) embed.addField(`\`${results[(i * 3) + j].name}\` - ${results[(i * 3) + j].title}`, `Percentage Complete: ${results[(i * 3) + j].percentageComplete}%`);
+				for (let j = 0; j < 10; j++) {
+					if (results[(i * 10) + j]) embed.addField(`\`${results[(i * 10) + j].name}\` - ${results[(i * 10) + j].title}`, `Percentage Complete: ${results[(i * 10) + j].percentageComplete}%`);
 				}
 
 				pages.push(embed);
