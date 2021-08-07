@@ -93,7 +93,7 @@ module.exports = {
 
 			if (results.length === 0) results.push('There are no templates in this progress checker!');
 
-			for (let i = 0; i < Math.ceil(results.length / 3); i++) {
+			for (let i = 0; i < Math.ceil(results.length / 10); i++) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:');
