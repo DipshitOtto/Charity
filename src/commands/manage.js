@@ -682,13 +682,13 @@ module.exports = {
 
 			if (results.length === 0) results.push('There are no templates with grief alert!');
 
-			for (let i = 0; i < Math.ceil(results.length / 10); i++) {
+			for (let i = 0; i < Math.ceil(results.length / 5); i++) {
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setTitle('Templates:');
 
-				for (let j = 0; j < 10; j++) {
-					if (results[(i * 10) + j]) embed.addField(`\`${results[(i * 10) + j].name}\` - ${results[(i * 10) + j].title}`, `Alert Type: ${(results[(i * 10) + j].alertType === 'basic') ? 'Basic' : 'Advanced'}\nAlert Channel: <#${results[(i * 10) + j].alertChannel}>${(results[(i * 10) + j].alertType === 'advanced') ? `\nAlert Threshold: ${results[(i * 10) + j].alertThreshold}` : ''}${(results[(i * 10) + j].alertType === 'advanced') ? `\nAlert Role: <@&${results[(i * 10) + j].alertRole}>` : ''}`);
+				for (let j = 0; j < 5; j++) {
+					if (results[(i * 5) + j]) embed.addField(`\`${results[(i * 5) + j].name}\` - ${results[(i * 5) + j].title}`, `Alert Type: ${(results[(i * 5) + j].alertType === 'basic') ? 'Basic' : 'Advanced'}\nAlert Channel: <#${results[(i * 5) + j].alertChannel}>${(results[(i * 5) + j].alertType === 'advanced') ? `\nAlert Threshold: ${results[(i * 5) + j].alertThreshold}` : ''}${(results[(i * 5) + j].alertType === 'advanced') ? `\nAlert Role: <@&${results[(i * 5) + j].alertRole}>` : ''}`);
 				}
 
 				pages.push(embed);

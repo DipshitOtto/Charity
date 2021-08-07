@@ -83,9 +83,9 @@ module.exports = {
 				});
 			});
 
-			if (stage === 0) {
-				results.sort((a, b) => a.name.localeCompare(b.name));
-			} else if (stage === 1) {
+			results.sort((a, b) => a.name.localeCompare(b.name));
+
+			if (stage === 1) {
 				results.sort((a, b) => a.percentageComplete - b.percentageComplete);
 			} else if (stage === 2) {
 				results.sort((a, b) => b.percentageComplete - a.percentageComplete);

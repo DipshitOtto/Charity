@@ -42,11 +42,11 @@ module.exports = {
 			switch (interaction.customId) {
 			case 'prevpage':
 				page = page > 0 ? --page : pages.length - 1;
-				interactionData[interaction.message.interaction.id].page = page > 0 ? --page : pages.length - 1;
+				interactionData[interaction.message.interaction.id].page = page;
 				break;
 			case 'nextpage':
 				page = page + 1 < pages.length ? ++page : 0;
-				interactionData[interaction.message.interaction.id].page = page + 1 < pages.length ? ++page : 0;
+				interactionData[interaction.message.interaction.id].page = page;
 				break;
 			default:
 				break;
