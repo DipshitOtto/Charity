@@ -630,7 +630,7 @@ module.exports = {
 
 			await database.editTemplate(name.value, interaction.guildId, { alert: false });
 			const embed = new Discord.MessageEmbed()
-				.setTitle(`:white_check_mark: Removed advanced grief alert from ${interactionData[interaction.id].template.title}!`)
+				.setTitle(`:white_check_mark: Removed advanced grief alert from ${template.title}!`)
 				.setDescription(`[Template Link](${template.reference})`)
 				.setImage('attachment://preview.png');
 			return await interaction.editReply({

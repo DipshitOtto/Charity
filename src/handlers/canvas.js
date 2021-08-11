@@ -359,6 +359,9 @@ module.exports = {
 		template = await Jimp.read(template);
 		actual = await Jimp.read(actual);
 
+		actual.color([{ apply: 'desaturate', params: [60] }]);
+		actual.color([{ apply: 'desaturate', params: [20] }]);
+
 		actual.composite(template, 0, 0);
 
 		return actual.getBufferAsync(Jimp.MIME_PNG);
