@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Jimp = require('jimp');
+const database = require('./handlers/database');
 
 let info;
 let board;
@@ -13,6 +14,7 @@ module.exports = {
 			info = await axios.get(`${process.env.PXLS_URL}info`, { responseType: 'json' });
 
 			module.exports.createBoard();
+			database.purgeTemplates(info.data.canvasCode);
 		} catch (error) {
 			console.error(error);
 		}

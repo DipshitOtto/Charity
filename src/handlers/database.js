@@ -110,4 +110,18 @@ module.exports = {
 			await mongo.close();
 		}
 	},
+	async purgeTemplates(canvasCode) {
+		const mongo = new MongoClient(process.env.DB_CONNECTION, {
+			useUnifiedTopology: true,
+		});
+		try {
+			await mongo.connect();
+			const database = mongo.db('charity');
+			const templates = database.collection('templates');
+
+			await templates.deleteMany({ canvasCode: { $ne: canvasCode } });
+		} finally {
+			await mongo.close();
+		}
+	},
 };
