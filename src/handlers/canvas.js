@@ -14,6 +14,9 @@ module.exports = {
 		if (width === undefined || width === null) width = board.bitmap.width;
 		if (height === undefined || height === null) height = board.bitmap.height;
 
+		if (x + width > board.bitmap.width) width = board.bitmap.width - x;
+		if (y + height > board.bitmap.height) height = board.bitmap.height - y;
+
 		let generated;
 		await Jimp.read(board).then(image => {
 			image.crop(x, y, width, height);

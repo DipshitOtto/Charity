@@ -91,7 +91,13 @@ module.exports = {
 				results.sort((a, b) => b.percentageComplete - a.percentageComplete);
 			}
 
-			if (results.length === 0) results.push('There are no templates in this progress checker!');
+			if (results.length === 0) {
+				const embed = new Discord.MessageEmbed()
+					.setColor(process.env.BOT_COLOR)
+					.setTitle('Templates:')
+					.setDescription('There are no templates in the progress checker!');
+				return await interaction.editReply({ embeds: [embed] });
+			}
 
 			for (let i = 0; i < Math.ceil(results.length / 10); i++) {
 				const embed = new Discord.MessageEmbed()
