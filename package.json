@@ -4,7 +4,9 @@
   "description": "A discord bot with information, progress, and monitors for pxls.space factions.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "react": "cd website/client && npm start",
+    "build": "cd website/client && npm run build"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
     "cwebp": "^2.0.5",
     "discord.js": "^13.0.0",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "file-type": "^16.2.0",
     "fs": "0.0.1-security",
     "jimp": "^0.16.1",

@@ -1,0 +1,164 @@
+@font-face {
+    font-family: Coming Sans;
+    src: url('../../assets/comingsans.ttf');
+  }
+    
+  .landing-container {
+      position: relative;
+    background-color: var(--primary);
+    height: 60vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    object-fit: contain;
+  }
+    
+  .landing-container > h1 {
+    color: #fff;
+    font-size: 100px;
+    line-height: 100px;
+    margin-bottom: 20px;
+    margin-top: -100px;
+    font-family: 'Coming Sans', sans-serif;
+    letter-spacing: 3px;
+  }
+  
+  .landing-container > p {
+    margin-top: 8px;
+    color: #fff;
+    font-size: 32px;
+    font-family: 'Patrick Hand', cursive;
+  }
+  
+  .landing-btns {
+    margin-top: 32px;
+  }
+    
+  .landing-btns .btn {
+    margin: 6px;
+  }
+    
+  .fa-play-circle {
+    margin-left: 4px;
+  }
+    
+  @media screen and (max-width: 960px) {
+    .landing-container > h1 {
+      font-size: 70px;
+      margin-top: -150px;
+    }
+  }
+    
+  @media screen and (max-width: 768px) {
+    .landing-container > h1 {
+      font-size: 50px;
+      margin-top: -100px;
+    }
+  
+    .landing-container > p {
+      font-size: 30px;
+    }
+  
+    .btn-mobile {
+      display: block;
+      text-decoration: none;
+    }
+  
+    .btn {
+      width: 100%;
+    }
+  }
+
+.shape-divider1 {
+    position: absolute;
+    top: 60vh;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.shape-divider1 svg {
+    position: relative;
+    display: block;
+    width: calc(120% + 1.3px);
+    height: 200px;
+}
+
+.shape-divider1 .shape-fill {
+    fill: var(--primary);
+}
+
+.template1-container {
+    background-color: var(--orange);
+    height: 60vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    object-fit: contain;
+}
+
+.template1-container > h1 {
+    color: #fff;
+    font-size: 60px;
+    line-height: 60px;
+    margin-bottom: 20px;
+    margin-top: -60px;
+    font-family: 'Coming Sans', sans-serif;
+    letter-spacing: 3px;
+    font-weight: 300;
+  }
+  
+  .template1-container > h1 > img {
+    height: 150px;
+  }
+  
+  .template1-container > p {
+    margin-top: 8px;
+    color: #fff;
+    font-size: 32px;
+    font-family: 'Patrick Hand', cursive;
+  }
+  
+  .template1-btns {
+    margin-top: 32px;
+  }
+    
+  .template1-btns .btn {
+    margin: 6px;
+  }
+    
+  .fa-play-circle {
+    margin-left: 4px;
+  }
+    
+  @media screen and (max-width: 960px) {
+    .template1-container > h1 {
+      font-size: 70px;
+      margin-top: -150px;
+    }
+  }
+    
+  @media screen and (max-width: 768px) {
+    .template1-container > h1 {
+      font-size: 50px;
+      margin-top: -100px;
+    }
+  
+    .template1-container > p {
+      font-size: 30px;
+    }
+  
+    .btn-mobile {
+      display: block;
+      text-decoration: none;
+    }
+  
+    .btn {
+      width: 100%;
+    }
+  }
