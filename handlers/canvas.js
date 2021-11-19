@@ -239,7 +239,7 @@ module.exports = {
 		} else if (color.match(/^(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5]),(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$/g)) {
 			color = ('#' + parseInt(color.split(',')[0]).toString(16) + parseInt(color.split(',')[1]).toString(16) + parseInt(color.split(',')[2]).toString(16)).toUpperCase();
 		} else {
-			const colors = fs.readFileSync('src/assets/colors.json');
+			const colors = fs.readFileSync('bot/assets/colors.json');
 			const palette = JSON.parse(colors);
 			color = palette.find(c => {return c.name.toLowerCase() === color.toLowerCase();});
 			if (color) {
@@ -262,9 +262,9 @@ module.exports = {
 			return Math.pow((col + 0.055) / 1.055, 2.4);
 		});
 		const L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
-		const fnt = (L > 0.179) ? 'src/assets/fonts/charity_8_black.fnt' : 'src/assets/fonts/charity_8_white.fnt';
+		const fnt = (L > 0.179) ? 'bot/assets/fonts/charity_8_black.fnt' : 'bot/assets/fonts/charity_8_white.fnt';
 
-		const colors = fs.readFileSync('src/assets/colors.json');
+		const colors = fs.readFileSync('bot/assets/colors.json');
 		const palette = JSON.parse(colors);
 		let closestColor = palette[0].value;
 		let closestColorDifference;
