@@ -4,9 +4,9 @@
   }
     
   .landing-container {
-      position: relative;
+    flex-grow: 1;
+    position: relative;
     background-color: var(--primary);
-    height: 60vh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -20,9 +20,9 @@
     font-size: 100px;
     line-height: 100px;
     margin-bottom: 20px;
-    margin-top: -100px;
     font-family: 'Coming Sans', sans-serif;
     letter-spacing: 3px;
+    text-align: center;
   }
   
   .landing-container > p {
@@ -30,10 +30,12 @@
     color: #fff;
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
+    text-align: center;
   }
   
   .landing-btns {
     margin-top: 32px;
+    padding-bottom: 20px;
   }
     
   .landing-btns .btn {
@@ -47,14 +49,12 @@
   @media screen and (max-width: 960px) {
     .landing-container > h1 {
       font-size: 70px;
-      margin-top: -150px;
     }
   }
     
   @media screen and (max-width: 768px) {
     .landing-container > h1 {
       font-size: 50px;
-      margin-top: -100px;
     }
   
     .landing-container > p {
@@ -72,19 +72,22 @@
   }
 
 .shape-divider1 {
-    position: absolute;
-    top: 60vh;
+    margin-top: -1px;
+    top: calc(100% - 1px);
     left: 0;
     width: 100%;
     overflow: hidden;
     line-height: 0;
+    min-height: 20px;
+    flex-shrink: 0;
+    background-color: var(--orange);
+    margin-bottom: -1px;
 }
 
 .shape-divider1 svg {
     position: relative;
     display: block;
     width: calc(120% + 1.3px);
-    height: 200px;
 }
 
 .shape-divider1 .shape-fill {
@@ -92,8 +95,8 @@
 }
 
 .template1-container {
+    flex-grow: 1;
     background-color: var(--orange);
-    height: 60vh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -107,10 +110,10 @@
     font-size: 60px;
     line-height: 60px;
     margin-bottom: 20px;
-    margin-top: -60px;
     font-family: 'Coming Sans', sans-serif;
     letter-spacing: 3px;
     font-weight: 300;
+    text-align: center;
   }
   
   .template1-container > h1 > img {
@@ -122,6 +125,7 @@
     color: #fff;
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
+    text-align: center;
   }
   
   .template1-btns {
@@ -139,14 +143,12 @@
   @media screen and (max-width: 960px) {
     .template1-container > h1 {
       font-size: 70px;
-      margin-top: -150px;
     }
   }
     
   @media screen and (max-width: 768px) {
     .template1-container > h1 {
       font-size: 50px;
-      margin-top: -100px;
     }
   
     .template1-container > p {
