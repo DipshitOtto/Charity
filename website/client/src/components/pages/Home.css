@@ -180,49 +180,49 @@
     display: block;
 }
 
-.sd-primary .shape-fill {
+.tsd-primary .shape-fill {
     fill: var(--primary);
 }
 
-.sd-primary {
+.tsd-primary {
     background-color: var(--orange);
 }
 
-.sd-orange .shape-fill {
+.tsd-orange .shape-fill {
     fill: var(--orange);
 }
 
-.sd-orange {
+.tsd-orange {
     background-color: var(--yellow);
 }
 
-.sd-yellow .shape-fill {
+.tsd-yellow .shape-fill {
     fill: var(--yellow);
 }
 
-.sd-yellow {
+.tsd-yellow {
     background-color: var(--green);
 }
 
-.sd-green .shape-fill {
+.tsd-green .shape-fill {
     fill: var(--green);
 }
 
-.sd-green {
+.tsd-green {
     background-color: var(--blue);
 }
-.sd-blue .shape-fill {
+.tsd-blue .shape-fill {
     fill: var(--blue);
 }
 
-.sd-blue {
+.tsd-blue {
     background-color: var(--purple);
 }
 
-.sd-purple .shape-fill {
+.tsd-purple .shape-fill {
     fill: var(--purple);
 }
 
-.sd-purple {
+.tsd-purple {
     background-color: var(--footer);
 }
