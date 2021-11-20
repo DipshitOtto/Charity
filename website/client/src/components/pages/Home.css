@@ -23,6 +23,7 @@
     font-family: 'Coming Sans', sans-serif;
     letter-spacing: 3px;
     text-align: center;
+    text-shadow: 2px 2px #aaa7;
   }
   
   .landing-container > p {
@@ -31,11 +32,13 @@
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
     text-align: center;
+    text-shadow: 2px 2px #aaa7;
   }
   
   .landing-btns {
     margin-top: 32px;
     padding-bottom: 20px;
+    text-align: center;
   }
     
   .landing-btns .btn {
@@ -67,36 +70,12 @@
     }
   
     .btn {
-      width: 100%;
+      width: 80%;
     }
   }
 
-.shape-divider1 {
-    margin-top: -1px;
-    top: calc(100% - 1px);
-    left: 0;
-    width: 100%;
-    overflow: hidden;
-    line-height: 0;
-    min-height: 20px;
-    flex-shrink: 0;
-    background-color: var(--orange);
-    margin-bottom: -1px;
-}
-
-.shape-divider1 svg {
-    position: relative;
-    display: block;
-    width: calc(120% + 1.3px);
-}
-
-.shape-divider1 .shape-fill {
-    fill: var(--primary);
-}
-
-.template1-container {
+.template-container {
     flex-grow: 1;
-    background-color: var(--orange);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -106,7 +85,7 @@
     padding-bottom: 100px;
 }
 
-.template1-container > h1 {
+.template-container > h1 {
     color: #fff;
     font-size: 60px;
     line-height: 60px;
@@ -115,25 +94,23 @@
     letter-spacing: 3px;
     font-weight: 300;
     text-align: center;
+    text-shadow: 2px 2px #aaa7;
   }
   
-  .template1-container > h1 > img {
-    height: 150px;
-  }
-  
-  .template1-container > p {
+  .template-container > p {
     margin-top: 8px;
     color: #fff;
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
     text-align: center;
+    text-shadow: 2px 2px #aaa7;
   }
   
-  .template1-btns {
+  .template-btns {
     margin-top: 32px;
   }
     
-  .template1-btns .btn {
+  .template-btns .btn {
     margin: 6px;
   }
     
@@ -142,17 +119,17 @@
   }
     
   @media screen and (max-width: 960px) {
-    .template1-container > h1 {
+    .template-container > h1 {
       font-size: 70px;
     }
   }
     
   @media screen and (max-width: 768px) {
-    .template1-container > h1 {
+    .template-container > h1 {
       font-size: 50px;
     }
   
-    .template1-container > p {
+    .template-container > p {
       font-size: 30px;
     }
   
@@ -162,6 +139,90 @@
     }
   
     .btn {
-      width: 100%;
+      width: 80%;
     }
   }
+
+  .template-orange {
+    background-color: var(--orange);
+  }
+
+  .template-yellow {
+    background-color: var(--yellow);
+  }
+
+  .template-green {
+    background-color: var(--green);
+  }
+
+  .template-blue {
+    background-color: var(--blue);
+  }
+
+  .template-purple {
+    background-color: var(--purple);
+  }
+
+.shape-divider {
+    margin-top: -1px;
+    top: calc(100% - 1px);
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    min-height: 20px;
+    flex-shrink: 0;
+    margin-bottom: -1px;
+}
+
+.shape-divider svg {
+    position: relative;
+    display: block;
+}
+
+.sd-primary .shape-fill {
+    fill: var(--primary);
+}
+
+.sd-primary {
+    background-color: var(--orange);
+}
+
+.sd-orange .shape-fill {
+    fill: var(--orange);
+}
+
+.sd-orange {
+    background-color: var(--yellow);
+}
+
+.sd-yellow .shape-fill {
+    fill: var(--yellow);
+}
+
+.sd-yellow {
+    background-color: var(--green);
+}
+
+.sd-green .shape-fill {
+    fill: var(--green);
+}
+
+.sd-green {
+    background-color: var(--blue);
+}
+.sd-blue .shape-fill {
+    fill: var(--blue);
+}
+
+.sd-blue {
+    background-color: var(--purple);
+}
+
+.sd-purple .shape-fill {
+    fill: var(--purple);
+}
+
+.sd-purple {
+    background-color: var(--footer);
+}
