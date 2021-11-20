@@ -23,7 +23,7 @@
     font-family: 'Coming Sans', sans-serif;
     letter-spacing: 3px;
     text-align: center;
-    text-shadow: 2px 2px #aaa7;
+    text-shadow: 2px 2px #7777;
   }
   
   .landing-container > p {
@@ -32,7 +32,7 @@
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
     text-align: center;
-    text-shadow: 2px 2px #aaa7;
+    text-shadow: 2px 2px #7777;
   }
   
   .landing-btns {
@@ -94,7 +94,7 @@
     letter-spacing: 3px;
     font-weight: 300;
     text-align: center;
-    text-shadow: 2px 2px #aaa7;
+    text-shadow: 2px 2px #7777;
   }
   
   .template-container > p {
@@ -103,7 +103,7 @@
     font-size: 32px;
     font-family: 'Patrick Hand', cursive;
     text-align: center;
-    text-shadow: 2px 2px #aaa7;
+    text-shadow: 2px 2px #7777;
   }
   
   .template-btns {
