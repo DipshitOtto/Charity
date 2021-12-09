@@ -10,7 +10,7 @@ module.exports = {
 	cooldown: 3,
 	options: [],
 	execute(interaction, client) {
-		fs.readFile('./src/assets/profile.png', async function(err, buffer) {
+		fs.readFile('./bot/assets/profile.png', async function(err, buffer) {
 			const embed = new Discord.MessageEmbed()
 				.setColor(process.env.BOT_COLOR)
 				.setTitle('🏓 Pong!')
