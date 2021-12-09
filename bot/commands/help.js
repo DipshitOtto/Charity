@@ -20,7 +20,7 @@ module.exports = {
 	execute(interaction, client) {
 		const argument = interaction.options.get('command');
 
-		fs.readFile('./src/assets/profile.png', async function(err, buffer) {
+		fs.readFile('./bot/assets/profile.png', async function(err, buffer) {
 			if (err) throw err;
 			const data = [];
 			const { commands } = client;
