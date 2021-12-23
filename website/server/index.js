@@ -89,7 +89,7 @@ module.exports = {
 					],
 				});
 				fs.writeFileSync(`${path.resolve(__dirname, 'templates')}/${req.file.filename}`, buffer);
-				res.send(`${req.protocol}://${req.get('host')}/${req.file.filename}`);
+				res.send(`${process.env.WEBSITE_URL}/${req.file.filename}`);
 			});
 		});
 
