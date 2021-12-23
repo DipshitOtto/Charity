@@ -1,0 +1,169 @@
+.container {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  object-fit: contain;
+  padding-bottom: 100px;
+  background-color: var(--blue);
+}
+
+.container > h1 {
+  color: #fff;
+  font-size: 60px;
+  line-height: 60px;
+  margin-bottom: 20px;
+  font-family: "Coming Sans", sans-serif;
+  letter-spacing: 3px;
+  font-weight: 300;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+.container > p {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 32px;
+  font-family: "Patrick Hand", cursive;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+@media screen and (max-width: 960px) {
+  .container > h1 {
+    font-size: 70px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container > h1 {
+    font-size: 50px;
+  }
+
+  .container > p {
+    font-size: 30px;
+  }
+}
+
+.shapeDivider {
+  margin-top: -1px;
+  top: calc(100% - 1px);
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  min-height: 20px;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  background-color: var(--purple);
+}
+
+.shapeDivider svg {
+  position: relative;
+  display: block;
+}
+
+.shapeDivider .shapeFill {
+  fill: var(--blue);
+}
+
+.subcontainer {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropZone {
+  flex-grow: 1;
+  width: 100%;
+  padding: 25px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "Patrick Hand", cursive;
+  font-weight: 500;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #77D3F7;
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  border: 4px dashed #fff;
+  border-radius: 10px;
+}
+
+.uploadIcon {
+  font-size: 5em;
+}
+
+.dropZone > span {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.btns {
+  float: right;
+  text-align: right;
+}
+
+.details > p {
+  font-size: 32px;
+  text-align: left;
+}
+
+.templateName {
+  margin-top: 10px !important;
+  background-color: #77D3F7 !important;
+}
+
+.templateName label {
+  color: white !important;
+  text-shadow: 2px 2px #7777;
+}
+
+.templateName > div input {
+  color: white;
+  text-shadow: 2px 2px #7777;
+}
+
+.templateName > div fieldset {
+  border-color: white !important;
+}
+
+.generate {
+  margin: 5px !important;
+  float: right;
+  width: fit-content;
+  height: 50px;
+}
+
+.templateLink {
+  flex-grow: 1;
+  width: 100%;
+  margin-top: 5px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "Patrick Hand", cursive;
+  font-weight: 500;
+  font-size: 25px;
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.templateLink > a {
+  color: white;
+}

@@ -1,0 +1,176 @@
+.container {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  object-fit: contain;
+  padding-bottom: 100px;
+  background-color: var(--orange);
+}
+
+.container > h1 {
+  color: #fff;
+  font-size: 60px;
+  line-height: 60px;
+  margin-bottom: 20px;
+  font-family: "Coming Sans", sans-serif;
+  letter-spacing: 3px;
+  font-weight: 300;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+.container > p {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 32px;
+  font-family: "Patrick Hand", cursive;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+@media screen and (max-width: 960px) {
+  .container > h1 {
+    font-size: 70px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container > h1 {
+    font-size: 50px;
+  }
+
+  .container > p {
+    font-size: 30px;
+  }
+}
+
+.shapeDivider {
+  margin-top: -1px;
+  top: calc(100% - 1px);
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  min-height: 20px;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  background-color: var(--green);
+}
+
+.shapeDivider svg {
+  position: relative;
+  display: block;
+}
+
+.shapeDivider .shapeFill {
+  fill: var(--orange);
+}
+
+.subcontainer {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropZone {
+  flex-grow: 1;
+  width: 100%;
+  padding: 25px;
+  display: inline-block;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: "Patrick Hand", cursive;
+  font-weight: 500;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #f7bb77;
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  border: 4px dashed #fff;
+  border-radius: 10px;
+}
+
+.dropZoneOver {
+  border-style: solid;
+}
+
+.uploadIcon {
+  font-size: 5em;
+}
+
+.dropZone > span {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.btns {
+    float: right;
+    text-align: right;
+}
+
+.download {
+  margin: 5px !important;
+  width: fit-content;
+  height: 50px;
+}
+
+.continue {
+  margin: 5px !important;
+  width: fit-content;
+  height: 50px;
+}
+
+.process {
+  margin: 5px !important;
+  width: fit-content;
+  height: 50px;
+}
+
+.details > p {
+  font-size: 32px;
+}
+
+.accordion {
+  margin-top: 5px !important;
+  border: 4px solid white;
+  background-color: #f7bb77 !important;
+  text-shadow: 2px 2px #7777;
+  color: white !important;
+  font-size: 25px;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+}
+
+.accordionIcon {
+  color: white;
+  text-shadow: none;
+}
+
+.details legend {
+  color: #fff;
+}
+
+.details fieldset {
+  width: 100%;
+  border-color: #fff !important;
+}
+
+.details fieldset label {
+  color: #fff !important;
+}
+
+.checkbox {
+    color: #fff !important;
+}

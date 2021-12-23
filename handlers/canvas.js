@@ -25,45 +25,6 @@ module.exports = {
 
 		return generated;
 	},
-	async reduce(buffer, palette) {
-		const fileType = await FileType.fromBuffer(buffer);
-		if (fileType.mime === 'image/webp') {
-			const decoder = new DWebp(buffer);
-			buffer = await decoder.toBuffer();
-		}
-		let generated;
-		await Jimp.read(buffer).then(async (image) => {
-			await image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-				const red = this.bitmap.data[idx + 0];
-				const green = this.bitmap.data[idx + 1];
-				const blue = this.bitmap.data[idx + 2];
-
-				let closestColor = palette[0].value;
-				let closestColorDifference;
-				for (let i = 0; i < palette.length; i++) {
-					let colorDifference = 0;
-					const color = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(palette[i].value);
-					colorDifference += Math.pow(red - parseInt(color[1], 16), 2);
-					colorDifference += Math.pow(green - parseInt(color[2], 16), 2);
-					colorDifference += Math.pow(blue - parseInt(color[3], 16), 2);
-					colorDifference = Math.sqrt(colorDifference);
-					if (colorDifference <= closestColorDifference || closestColorDifference === undefined || closestColorDifference === null) {
-						closestColor = {
-							r: parseInt(color[1], 16),
-							g: parseInt(color[2], 16),
-							b: parseInt(color[3], 16),
-						};
-						closestColorDifference = colorDifference;
-					}
-				}
-				image.bitmap.data[idx + 0] = closestColor.r;
-				image.bitmap.data[idx + 1] = closestColor.g;
-				image.bitmap.data[idx + 2] = closestColor.b;
-			});
-			generated = image.getBufferAsync(Jimp.MIME_PNG);
-		}).catch(err => console.error(err));
-		return generated;
-	},
 	async detemplatize(buffer, width, height, scaleFactor) {
 		const fileType = await FileType.fromBuffer(buffer);
 		if (fileType.mime === 'image/webp') {

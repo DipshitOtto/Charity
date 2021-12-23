@@ -1,0 +1,97 @@
+:root {
+  --footer: #c480e0;
+}
+
+.container {
+  background-color: var(--footer);
+  padding: 1rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.thirdParty {
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  font-size: 24px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Social Icons */
+.socialIconLink {
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  font-size: 24px;
+}
+
+.socialMedia {
+  max-width: 1000px;
+  width: 100%;
+}
+
+.socialMediaWrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 1000px;
+  margin: 1rem auto 0 auto;
+}
+
+.socialIcons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 240px;
+}
+
+.socialLogo {
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  justify-self: start;
+  margin-left: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  font-family: "Coming Sans", sans-serif;
+  letter-spacing: 1px;
+}
+
+.icon {
+  height: 80px;
+}
+
+.attribution {
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  font-size: 20px;
+}
+
+.attribution > a {
+  color: #fff;
+  text-shadow: 2px 2px #7777;
+  font-size: 20px;
+}
+
+@media screen and (max-width: 820px) {
+  .links {
+    padding-top: 2rem;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .socialMediaWrap {
+    flex-direction: column;
+  }
+}

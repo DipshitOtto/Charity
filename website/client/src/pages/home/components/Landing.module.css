@@ -1,0 +1,91 @@
+.container {
+  flex-grow: 1;
+  position: relative;
+  background-color: var(--primary);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  object-fit: contain;
+}
+
+.container > h1 {
+  color: #fff;
+  font-size: 100px;
+  line-height: 100px;
+  margin-bottom: 20px;
+  font-family: "Coming Sans", sans-serif;
+  letter-spacing: 3px;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+.container > p {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 32px;
+  font-family: "Patrick Hand", cursive;
+  text-align: center;
+  text-shadow: 2px 2px #7777;
+}
+
+.btns {
+  margin-top: 32px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.btns button {
+  margin: 6px;
+}
+
+.btns a {
+  margin: 6px;
+}
+
+@media screen and (max-width: 960px) {
+  .container > h1 {
+    font-size: 70px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container > h1 {
+    font-size: 50px;
+  }
+
+  .container > p {
+    font-size: 30px;
+  }
+
+  .btns button {
+    width: 80%;
+  }
+
+  .btns a {
+    width: 80%;
+  }
+}
+
+.shapeDivider {
+  margin-top: -1px;
+  top: calc(100% - 1px);
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  min-height: 20px;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  background-color: var(--orange);
+}
+
+.shapeDivider svg {
+  position: relative;
+  display: block;
+}
+
+.shapeDivider .shapeFill {
+  fill: var(--primary);
+}

@@ -1,0 +1,14 @@
+{
+    "name": "image-api",
+    "version": "0.0.1",
+    "description": "An API for the image functionality Charity uses for it's functions.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Mikarific",
+    "license": "MIT",
+    "dependencies": {
+        "jimp": "^0.16.1"
+    }
+}

@@ -105,3 +105,9 @@ dist
 
 # Package Lock
 package-lock.json
+
+#VSCode
+.vscode
+
+#templates
+website/server/templates
