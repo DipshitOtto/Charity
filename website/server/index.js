@@ -75,9 +75,11 @@ module.exports = {
 	start() {
 		const app = express();
 
+		const pxlsURL = new URL(process.env.PXLS_URL);
+
 		app.use(
 			cors({
-				origin: process.env.PXLS_URL,
+				origin: [`https://${pxlsURL.host}`, `http://${pxlsURL.host}`],
 				optionsSuccessStatus: 200,
 			}),
 		);
@@ -103,7 +105,9 @@ module.exports = {
 		});
 
 		app.post('/api/upload', (req, res) => {
-			if (!fs.existsSync(path.resolve(__dirname, 'templates'))) {fs.mkdirSync(path.resolve(__dirname, 'templates'));}
+			if (!fs.existsSync(path.resolve(__dirname, 'templates'))) {
+				fs.mkdirSync(path.resolve(__dirname, 'templates'));
+			}
 			upload(req, res, async (err) => {
 				if (err) {
 					console.error(err);

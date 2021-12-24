@@ -1,10 +1,6 @@
 import React from "react";
 import {
-  Button,
   TextField,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useDropzone } from "react-dropzone";
@@ -17,7 +13,6 @@ function Step3(props) {
   const [templateName, setTemplateName] = React.useState("");
   const [templateLink, setTemplateLink] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const [uploaded, setUploaded] = React.useState(false);
 
   const step3 = React.useRef();
 
@@ -29,7 +24,6 @@ function Step3(props) {
         block: "center",
         inline: "center",
       });
-      setUploaded(false);
     }
   }, [props.processedImage]);
 
@@ -127,7 +121,7 @@ function Step3(props) {
           </div>
           <div className={styles.templateLink}>
             {templateLink ? (
-              <a href={templateLink} target="_blank">
+              <a href={templateLink} target="_blank" rel="noopener noreferrer">
                 {templateLink}
               </a>
             ) : (
