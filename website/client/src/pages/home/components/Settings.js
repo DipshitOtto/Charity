@@ -6,7 +6,7 @@ function Settings() {
     <>
       <div className={styles.container}>
         <h1>Settings</h1>
-        <p>Settings are Coming Soon!</p>
+        <p>Settings are Coming Soon™!</p>
       </div>
       <div className={styles.shapeDivider}>
         <svg

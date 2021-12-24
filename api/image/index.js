@@ -263,6 +263,7 @@ class Image {
 				const destPixels = image.bitmap.data;
 				const destPixelsLength = destPixels.length;
 				for (let i = destPixelsLength - 1; i >= 0; i -= 4) {
+					destPixels[i] >= 128 ? destPixels[i] = 255 : destPixels[i] = 0;
 					if (destPixels[i] === 255) {
 						const pixelColor = [
 							destPixels[i - 3],

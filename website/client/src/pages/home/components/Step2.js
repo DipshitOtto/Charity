@@ -6,7 +6,7 @@ function Step2() {
     <>
       <div className={styles.container}>
         <h1>Step 2 - Templatize your Image</h1>
-        <p>Templatizing is Coming Soon!</p>
+        <p>Templatizing is Coming Soon™!</p>
       </div>
       <div className={styles.shapeDivider}>
         <svg

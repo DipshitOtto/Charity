@@ -6,7 +6,7 @@ function ComingSoon() {
   return (
     <>
       <div className="comingsoon-container">
-        <h1>Coming Soon</h1>
+        <h1>Coming Soon™</h1>
         <p>This feature isn't done yet!</p>
       </div>
       <div className="shape-divider cssd-primary">
