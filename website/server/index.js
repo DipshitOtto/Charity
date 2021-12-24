@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
+const cors = require('cors');
 const multer = require('multer');
 const imagemin = require('imagemin');
 const imageminOptipng = require('imagemin-optipng');
@@ -8,13 +9,29 @@ const imageminOptipng = require('imagemin-optipng');
 const { Pxls } = require('../../api/pxls');
 
 function stringHasSlur(string) {
-	if (string.match(/([nN][iI1loO0a4A][gGq])+(l[e3E]+t+|[e3Ea4A]*[rR]*|n[oO0]+[gGq]+|[a4A]*)*[sS]*/g)) {
+	if (
+		string.match(
+			/([nN][iI1loO0a4A][gGq])+(l[e3E]+t+|[e3Ea4A]*[rR]*|n[oO0]+[gGq]+|[a4A]*)*[sS]*/g,
+		)
+	) {
 		return true;
-	} else if (string.match(/[fF]+[aA4]+[gGq]+([oO0e3EiI1l]+[tT]+([rR]+[yY]+|[rR]+[iI1l]+[e3E]+)?)?[sS]*/g)) {
+	} else if (
+		string.match(
+			/[fF]+[aA4]+[gGq]+([oO0e3EiI1l]+[tT]+([rR]+[yY]+|[rR]+[iI1l]+[e3E]+)?)?[sS]*/g,
+		)
+	) {
 		return true;
-	} else if (string.match(/[kK]+[iI1lyY]+[k]+[e3E]([rR]+[yY]+|[rR]+[iI1l]+[e3E]+)?[sS]*/g)) {
+	} else if (
+		string.match(
+			/[kK]+[iI1lyY]+[k]+[e3E]([rR]+[yY]+|[rR]+[iI1l]+[e3E]+)?[sS]*/g,
+		)
+	) {
 		return true;
-	} else if (string.match(/[tT]+[rR]+([aA4]+[nN]+([iI1l]+|[yY]+|[e3E]+[rR]+|[oO0]+[iI1l]+[dD]+)|[oO0]+[iI1l]+[dD]+)[sS]*/g)) {
+	} else if (
+		string.match(
+			/[tT]+[rR]+([aA4]+[nN]+([iI1l]+|[yY]+|[e3E]+[rR]+|[oO0]+[iI1l]+[dD]+)|[oO0]+[iI1l]+[dD]+)[sS]*/g,
+		)
+	) {
 		return true;
 	} else if (string.match(/[cC]+[oO0]{2,}[nN]+[sS]*/g)) {
 		return true;
@@ -33,7 +50,10 @@ function createFileName(length) {
 	for (let i = 0; i < length; i++) {
 		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	}
-	if (fs.existsSync(`${path.resolve(__dirname, 'templates')}/${result}.png`) || stringHasSlur(result)) {
+	if (
+		fs.existsSync(`${path.resolve(__dirname, 'templates')}/${result}.png`) ||
+    stringHasSlur(result)
+	) {
 		return createFileName(length);
 	} else {
 		return `${result}.png`;
@@ -55,6 +75,12 @@ module.exports = {
 	start() {
 		const app = express();
 
+		app.use(
+			cors({
+				origin: ['https://pxls.space', 'http://pxls.space'],
+				optionsSuccessStatus: 200,
+			}),
+		);
 		app.use(express.static(path.resolve(__dirname, '../client/build')));
 		app.use(express.static(path.resolve(__dirname, 'templates')));
 
@@ -77,18 +103,24 @@ module.exports = {
 		});
 
 		app.post('/api/upload', (req, res) => {
-			if (!fs.existsSync(path.resolve(__dirname, 'templates'))) fs.mkdirSync(path.resolve(__dirname, 'templates'));
+			if (!fs.existsSync(path.resolve(__dirname, 'templates'))) {fs.mkdirSync(path.resolve(__dirname, 'templates'));}
 			upload(req, res, async (err) => {
 				if (err) {
 					console.error(err);
 					res.sendStatus(500);
 				}
-				const buffer = await imagemin.buffer(fs.readFileSync(`${path.resolve(__dirname, 'templates')}/${req.file.filename}`), {
-					plugins: [
-						imageminOptipng(),
-					],
-				});
-				fs.writeFileSync(`${path.resolve(__dirname, 'templates')}/${req.file.filename}`, buffer);
+				const buffer = await imagemin.buffer(
+					fs.readFileSync(
+						`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
+					),
+					{
+						plugins: [imageminOptipng()],
+					},
+				);
+				fs.writeFileSync(
+					`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
+					buffer,
+				);
 				res.send(`${process.env.WEBSITE_URL}${req.file.filename}`);
 			});
 		});
