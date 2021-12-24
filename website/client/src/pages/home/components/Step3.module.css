@@ -112,8 +112,15 @@
 }
 
 .btns {
+  align-items: center;
+  display: flex;
   float: right;
   text-align: right;
+}
+
+.ratelimit {
+  flex-grow: 1;
+  color: #FF0000
 }
 
 .details > p {

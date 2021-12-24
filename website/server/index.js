@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const multer = require('multer');
 const imagemin = require('imagemin');
@@ -77,6 +78,8 @@ module.exports = {
 
 		const pxlsURL = new URL(process.env.PXLS_URL);
 
+		app.set('trust proxy', 1);
+
 		app.use(
 			cors({
 				origin: [`https://${pxlsURL.host}`, `http://${pxlsURL.host}`],
@@ -104,30 +107,37 @@ module.exports = {
 			});
 		});
 
-		app.post('/api/upload', (req, res) => {
-			if (!fs.existsSync(path.resolve(__dirname, 'templates'))) {
-				fs.mkdirSync(path.resolve(__dirname, 'templates'));
-			}
-			upload(req, res, async (err) => {
-				if (err) {
-					console.error(err);
-					res.sendStatus(500);
+		app.post(
+			'/api/upload',
+			rateLimit({
+				windowMs: 2 * 60 * 1000,
+				max: 1,
+			}),
+			(req, res) => {
+				if (!fs.existsSync(path.resolve(__dirname, 'templates'))) {
+					fs.mkdirSync(path.resolve(__dirname, 'templates'));
 				}
-				const buffer = await imagemin.buffer(
-					fs.readFileSync(
+				upload(req, res, async (err) => {
+					if (err) {
+						console.error(err);
+						res.sendStatus(500);
+					}
+					const buffer = await imagemin.buffer(
+						fs.readFileSync(
+							`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
+						),
+						{
+							plugins: [imageminOptipng()],
+						},
+					);
+					fs.writeFileSync(
 						`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
-					),
-					{
-						plugins: [imageminOptipng()],
-					},
-				);
-				fs.writeFileSync(
-					`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
-					buffer,
-				);
-				res.send(`${process.env.WEBSITE_URL}${req.file.filename}`);
-			});
-		});
+						buffer,
+					);
+					res.send(`${process.env.WEBSITE_URL}${req.file.filename}`);
+				});
+			},
+		);
 
 		app.get('*', (req, res) => {
 			res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));

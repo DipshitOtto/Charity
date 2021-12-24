@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  TextField,
-} from "@mui/material";
+import { TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useDropzone } from "react-dropzone";
 import styles from "./Step3.module.css";
@@ -13,12 +11,15 @@ function Step3(props) {
   const [templateName, setTemplateName] = React.useState("");
   const [templateLink, setTemplateLink] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [ratelimit, setRatelimit] = React.useState("");
 
   const step3 = React.useRef();
 
   React.useEffect(() => {
     if (props.processedImage) {
       setFile(props.processedImage);
+      setDisabled(false);
       step3.current.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -40,6 +41,7 @@ function Step3(props) {
               buffer: reader.result,
             })
           );
+          setDisabled(false);
         };
         reader.readAsArrayBuffer(file);
       });
@@ -47,29 +49,40 @@ function Step3(props) {
   });
 
   function generateTemplateLink() {
+    setDisabled(true);
     setLoading(true);
     if (file) {
       const data = new FormData();
       data.append("file", file);
-      axios.post("/api/upload", data).then(async (res) => {
-        const info = await axios.get(`/api/info`, { responseType: "json" });
-        const img = new Image();
-        img.src = file.preview;
-        img.onload = function () {
-          setTemplateLink(
-            `${info.data.pxlsURL}#template=${encodeURIComponent(res.data)}&tw=${
-              img.width
-            }&oo=1&ox=${Math.floor(
-              (info.data.width - img.width) / 2
-            )}&oy=${Math.floor(
-              (info.data.height - img.height) / 2
-            )}&x=${Math.floor(info.data.width / 2)}&y=${Math.floor(
-              info.data.height / 2
-            )}&scale=1&title=${encodeURIComponent(templateName)}`
-          );
-          setLoading(false);
-        };
-      });
+      axios
+        .post("/api/upload", data)
+        .then(async (res) => {
+          const info = await axios.get(`/api/info`, { responseType: "json" });
+          const img = new Image();
+          img.src = file.preview;
+          img.onload = function () {
+            setTemplateLink(
+              `${info.data.pxlsURL}#template=${encodeURIComponent(
+                res.data
+              )}&tw=${img.width}&oo=1&ox=${Math.floor(
+                (info.data.width - img.width) / 2
+              )}&oy=${Math.floor(
+                (info.data.height - img.height) / 2
+              )}&x=${Math.floor(info.data.width / 2)}&y=${Math.floor(
+                info.data.height / 2
+              )}&scale=1&title=${encodeURIComponent(templateName)}`
+            );
+            setLoading(false);
+            setRatelimit("");
+          };
+        })
+        .catch((error) => {
+          if (error.response.status === 429) {
+            setDisabled(false);
+            setLoading(false);
+            setRatelimit("Slow down! You can't upload images this quickly!");
+          }
+        });
     }
   }
 
@@ -102,10 +115,14 @@ function Step3(props) {
             label="Template Name"
             variant="outlined"
             onChange={(e) => {
+              if (templateLink !== "" && e.target.value !== "") {
+                setTemplateLink(`${templateLink.split('&title=')[0]}&title=${encodeURIComponent(e.target.value)}`);
+              }
               setTemplateName(e.target.value);
             }}
           />
           <div className={styles.btns}>
+            <p className={styles.ratelimit}>{ratelimit}</p>
             <LoadingButton
               className={styles.generate}
               onClick={generateTemplateLink}
@@ -113,7 +130,7 @@ function Step3(props) {
               size="large"
               color="white"
               loading={loading}
-              disabled={!file || !templateName.length}
+              disabled={!file || !templateName.length || disabled}
             >
               Generate&nbsp;
               <i className="fas fa-link" />
