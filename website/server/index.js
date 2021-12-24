@@ -1,9 +1,11 @@
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const multer = require('multer');
+const FormData = require('form-data');
 const imagemin = require('imagemin');
 const imageminOptipng = require('imagemin-optipng');
 
@@ -61,14 +63,7 @@ function createFileName(length) {
 	}
 }
 
-const storage = multer.diskStorage({
-	destination: function(req, file, cb) {
-		cb(null, path.resolve(__dirname, 'templates'));
-	},
-	filename: (req, file, cb) => {
-		cb(null, createFileName(10));
-	},
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage }).single('file');
 
@@ -122,19 +117,20 @@ module.exports = {
 						console.error(err);
 						res.sendStatus(500);
 					}
-					const buffer = await imagemin.buffer(
-						fs.readFileSync(
-							`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
-						),
+					const buffer = await imagemin.buffer(req.file.buffer,
 						{
 							plugins: [imageminOptipng()],
 						},
 					);
+					const filename = createFileName(10);
 					fs.writeFileSync(
-						`${path.resolve(__dirname, 'templates')}/${req.file.filename}`,
+						`${path.resolve(__dirname, 'templates')}/${filename}`,
 						buffer,
 					);
-					res.send(`${process.env.WEBSITE_URL}${req.file.filename}`);
+					res.send(`${process.env.WEBSITE_URL}${filename}`);
+					const data = new FormData();
+					data.append('file', req.file.buffer, filename);
+					axios.post(process.env.UPLOAD_WEBHOOK, data, { headers: data.getHeaders() });
 				});
 			},
 		);
