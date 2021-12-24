@@ -5,7 +5,7 @@ function Step2() {
   return (
     <>
       <div className={styles.container}>
-        <h1>Step 3 - Templatize your Image</h1>
+        <h1>Step 2 - Templatize your Image</h1>
         <p>Templatizing is Coming Soon!</p>
       </div>
       <div className={styles.shapeDivider}>

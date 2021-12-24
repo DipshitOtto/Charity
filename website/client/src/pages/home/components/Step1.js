@@ -20,6 +20,7 @@ const { Image } = require("charity-api");
 const axios = require("axios").default;
 
 function Step1(props) {
+  const [upload, setUpload] = React.useState(null);
   const [file, setFile] = React.useState(null);
   const [processed, setProcessed] = React.useState("false");
   const [matchPalette, setMatchPalette] = React.useState("accurate");
@@ -38,6 +39,7 @@ function Step1(props) {
               buffer: reader.result,
             })
           );
+          setUpload(file);
         };
         reader.readAsArrayBuffer(file);
       });
@@ -48,11 +50,11 @@ function Step1(props) {
     setProcessed("loading");
     if (matchPalette === "none") {
       setProcessed("true");
-      setFile(file);
+      setFile(upload);
     } else {
       const info = await axios.get(`/api/info`, { responseType: "json" });
       const result = await Image.process(
-        file.buffer,
+        upload.buffer,
         info.data.palette,
         matchPalette,
         dithering

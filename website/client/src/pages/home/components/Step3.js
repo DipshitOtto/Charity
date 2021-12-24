@@ -65,11 +65,13 @@ function Step3(props) {
           setTemplateLink(
             `${info.data.pxlsURL}#template=${encodeURIComponent(res.data)}&tw=${
               img.width
-            }&oo=1&ox=${(info.data.width - img.width) / 2}&oy=${
+            }&oo=1&ox=${Math.floor(
+              (info.data.width - img.width) / 2
+            )}&oy=${Math.floor(
               (info.data.height - img.height) / 2
-            }&x=${info.data.width / 2}&y=${
+            )}&x=${Math.floor(info.data.width / 2)}&y=${Math.floor(
               info.data.height / 2
-            }&scale=1&title=${encodeURIComponent(templateName)}`
+            )}&scale=1&title=${encodeURIComponent(templateName)}`
           );
           setLoading(false);
         };
@@ -80,7 +82,7 @@ function Step3(props) {
   return (
     <>
       <div className={styles.container} ref={step3}>
-        <h1>Step 4 - Generate a Template Link</h1>
+        <h1>Step 3 - Generate a Template Link</h1>
         <div className={styles.subcontainer}>
           <div className={styles.dropZone} {...getRootProps()}>
             <input {...getInputProps()} />

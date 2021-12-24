@@ -77,7 +77,7 @@ module.exports = {
 
 		app.use(
 			cors({
-				origin: ['https://pxls.space', 'http://pxls.space'],
+				origin: process.env.PXLS_URL,
 				optionsSuccessStatus: 200,
 			}),
 		);
