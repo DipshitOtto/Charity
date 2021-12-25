@@ -1,5 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 
 const websocket = require('../handlers/websocket');
 const clock = require('../handlers/clock');
@@ -77,11 +79,24 @@ module.exports = {
 						}
 					}
 				}
-				await client.application?.commands.set(data);
-				const embed = new Discord.MessageEmbed()
-					.setColor(process.env.BOT_COLOR)
-					.setDescription(':white_check_mark: Deployed all slash commands globally!');
-				message.channel.send({ embeds: [embed] });
+				const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
+				(async () => {
+					try {
+						console.log('Started refreshing application (/) commands.');
+
+						await rest.put(
+							Routes.applicationCommands(process.env.APP_ID),
+							{ body: data },
+						);
+
+						const embed = new Discord.MessageEmbed()
+							.setColor(process.env.BOT_COLOR)
+							.setDescription(':white_check_mark: Deployed all slash commands globally!');
+						message.channel.send({ embeds: [embed] });
+					} catch (error) {
+						console.error(error);
+					}
+				})();
 			}
 
 			if (command === 'slash') {
