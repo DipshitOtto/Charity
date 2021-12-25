@@ -77,6 +77,7 @@ module.exports = {
 						}
 					}
 				}
+				await client.application?.commands.set(data);
 				const embed = new Discord.MessageEmbed()
 					.setColor(process.env.BOT_COLOR)
 					.setDescription(':white_check_mark: Deployed all slash commands globally!');
