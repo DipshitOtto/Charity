@@ -17,8 +17,8 @@ function Step3(props) {
   const step3 = React.useRef();
 
   React.useEffect(() => {
-    if (props.processedImage) {
-      setFile(props.processedImage);
+    if (props.templatizedImage) {
+      setFile(props.templatizedImage);
       setDisabled(false);
       step3.current.scrollIntoView({
         behavior: "smooth",
@@ -26,7 +26,7 @@ function Step3(props) {
         inline: "center",
       });
     }
-  }, [props.processedImage]);
+  }, [props.templatizedImage]);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: "image/*",
@@ -64,10 +64,10 @@ function Step3(props) {
             setTemplateLink(
               `${info.data.pxlsURL}#template=${encodeURIComponent(
                 res.data
-              )}&tw=${img.width}&oo=1&ox=${Math.floor(
-                (info.data.width - img.width) / 2
+              )}&tw=${img.width / props.templateScale}&oo=1&ox=${Math.floor(
+                (info.data.width - img.width / props.templateScale) / 2
               )}&oy=${Math.floor(
-                (info.data.height - img.height) / 2
+                (info.data.height - img.width / props.templateScale) / 2
               )}&x=${Math.floor(info.data.width / 2)}&y=${Math.floor(
                 info.data.height / 2
               )}&scale=1&title=${encodeURIComponent(templateName)}`

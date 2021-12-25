@@ -1,12 +1,227 @@
 import React from "react";
+import {
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  Checkbox,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { useDropzone } from "react-dropzone";
 import styles from "./Step2.module.css";
 
-function Step2() {
+const { Image } = require("charity-api");
+
+const axios = require("axios").default;
+
+function Step2(props) {
+  const [upload, setUpload] = React.useState(null);
+  const [file, setFile] = React.useState(null);
+  const [templatized, setTemplatized] = React.useState("false");
+  const [style, setStyle] = React.useState("symbols");
+  const [glow, setGlow] = React.useState(false);
+
+  const step2 = React.useRef();
+
+  React.useEffect(() => {
+    if (props.processedImage) {
+      setFile(props.processedImage);
+      setUpload(props.processedImage);
+      step2.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [props.processedImage]);
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "image/*",
+    multiple: false,
+    onDrop: (acceptedFiles) => {
+      acceptedFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setFile(
+            Object.assign(file, {
+              preview: URL.createObjectURL(file),
+              buffer: reader.result,
+            })
+          );
+          setUpload(file);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    },
+  });
+
+  async function templatizeImage() {
+    setTemplatized("loading");
+    if (style === "none") {
+      setTemplatized("true");
+      setFile(upload);
+    } else {
+      const info = await axios.get(`/api/info`, { responseType: "json" });
+      const result = await Image.templatize(
+        upload.buffer,
+        info.data.palette,
+        style,
+        glow
+      );
+      props.setTemplateScale(result.scale);
+      const fileResult = new File([result.image.buffer], "templatized.png", {
+        type: "image/png",
+      });
+      setTemplatized("true");
+      setFile(
+        Object.assign(fileResult, {
+          preview: URL.createObjectURL(fileResult),
+          buffer: result.buffer,
+        })
+      );
+    }
+  }
+
+  function downloadButton() {
+    const link = document.createElement("a");
+    link.download = "templatized.png";
+    link.setAttribute("href", file.preview);
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   return (
     <>
-      <div className={styles.container}>
+      <div className={styles.container} ref={step2}>
         <h1>Step 2 - Templatize your Image</h1>
-        <p>Templatizing is Coming Soon™!</p>
+        <div className={styles.subcontainer}>
+          <div className={styles.dropZone} {...getRootProps()}>
+            <input {...getInputProps()} />
+            {!file ? (
+              <>
+                <i className={`fas fa-upload ${styles.uploadIcon}`} />
+                <br />
+                <span>Drop an Image Here or Click to Upload</span>
+              </>
+            ) : (
+              <img
+                key={file.preview.toString()}
+                id="uploadedImage"
+                src={file.preview}
+                className={styles.image}
+                alt="preview"
+              />
+            )}
+          </div>
+          <div>
+            <Accordion className={styles.accordion}>
+              <AccordionSummary
+                expandIcon={
+                  <i
+                    className={`${styles.accordionIcon} fas fa-chevron-down`}
+                  />
+                }
+              >
+                Advanced Options
+              </AccordionSummary>
+              <AccordionDetails className={styles.details}>
+                <FormControl component="fieldset">
+                  <FormLabel color="white" component="legend">
+                    Template Style:
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    aria-label="matchPalette"
+                    name="row-radio-buttons-group"
+                    defaultValue="symbols"
+                    onChange={(e) => {
+                      setStyle(e.target.value);
+                    }}
+                  >
+                    <FormControlLabel
+                      value="dotted-small"
+                      control={<Radio color="white" />}
+                      label="Dotted (Small, 1:2)"
+                    />
+
+                    <FormControlLabel
+                      value="dotted-big"
+                      control={<Radio color="white" />}
+                      label="Dotted (Big, 2:2)"
+                    />
+                    <FormControlLabel
+                      value="symbols"
+                      control={<Radio color="white" />}
+                      label="Symbols"
+                    />
+                    <FormControlLabel
+                      value="numbers"
+                      control={<Radio color="white" />}
+                      label="Numbers"
+                    />
+                    <FormControlLabel
+                      value="none"
+                      control={<Radio color="white" />}
+                      label="None"
+                    />
+                  </RadioGroup>
+                  <FormControlLabel
+                    control={<Checkbox className={styles.checkbox} />}
+                    label="Glow?"
+                    onChange={(e) => {
+                      setGlow(e.target.checked);
+                    }}
+                  />
+                </FormControl>
+              </AccordionDetails>
+            </Accordion>
+            <div className={styles.btns}>
+              <LoadingButton
+                className={styles.process}
+                onClick={templatizeImage}
+                variant="contained"
+                size="large"
+                color="white"
+                disabled={!file}
+                loading={templatized === "loading"}
+              >
+                Templatize&nbsp;
+                <i className="fas fa-th-large" />
+              </LoadingButton>
+              <Button
+                className={styles.download}
+                onClick={downloadButton}
+                variant="contained"
+                size="large"
+                color="white"
+                disabled={!file}
+              >
+                Download&nbsp;
+                <i className="fas fa-download" />
+              </Button>
+              <Button
+                className={styles.continue}
+                variant="contained"
+                size="large"
+                color="white"
+                onClick={() => {
+                  props.setTemplatizedImage(file);
+                }}
+                disabled={templatized === "false" || templatized === "loading"}
+              >
+                Continue&nbsp;
+                <i className="fas fa-chevron-right" />
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
       <div className={styles.shapeDivider}>
         <svg

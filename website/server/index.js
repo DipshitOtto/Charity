@@ -128,9 +128,11 @@ module.exports = {
 						buffer,
 					);
 					res.send(`${process.env.WEBSITE_URL}${filename}`);
-					const data = new FormData();
-					data.append('file', req.file.buffer, filename);
-					axios.post(process.env.UPLOAD_WEBHOOK, data, { headers: data.getHeaders() });
+					if (process.env.UPLOAD_WEBHOOK) {
+						const data = new FormData();
+						data.append('file', req.file.buffer, filename);
+						axios.post(process.env.UPLOAD_WEBHOOK, data, { headers: data.getHeaders() });
+					}
 				});
 			},
 		);

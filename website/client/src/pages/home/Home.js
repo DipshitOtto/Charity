@@ -11,13 +11,15 @@ function Home() {
   const step1 = createRef();
 
   const [processedImage, setProcessedImage] = useState(null);
+  const [templatizedImage, setTemplatizedImage] = useState(null);
+  const [templateScale, setTemplateScale] = useState(1);
 
   return (
     <>
       <Landing step1={step1}/>
       <Step1 step1={step1} processedImage={processedImage} setProcessedImage={setProcessedImage}/>
-      <Step2 />
-      <Step3 processedImage={processedImage} setProcessedImage={setProcessedImage}/>
+      <Step2 processedImage={processedImage} setProcessedImage={setProcessedImage} templatizedImage={templatizedImage} setTemplatizedImage={setTemplatizedImage} setTemplateScale={setTemplateScale}/>
+      <Step3 templatizedImage={templatizedImage} setTemplatizedImage={setTemplatizedImage} templateScale={templateScale}/>
       <Settings />
     </>
   );
