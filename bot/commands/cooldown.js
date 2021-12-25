@@ -1,22 +1,21 @@
 const pxls = require('../../handlers/pxls');
 
+const { SlashCommandBuilder, SlashCommandIntegerOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 module.exports = {
-	name: 'cooldown',
-	description: 'Gets the current canvas cooldown.',
-	aliases: [],
+	data: new SlashCommandBuilder()
+		.setName('cooldown')
+		.setDescription('Gets the current canvas cooldown.')
+		.addIntegerOption(
+			new SlashCommandIntegerOption()
+				.setName('users')
+				.setDescription('The number of users you want to calculate the cooldown for.')
+				.setRequired(false),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
-	options: [
-		{
-			name: 'users',
-			type: 'INTEGER',
-			description: 'The number of users you want to calculate the cooldown for.',
-			required: false,
-		},
-	],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

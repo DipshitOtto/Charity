@@ -1,3 +1,4 @@
+const { SlashCommandBuilder, SlashCommandStringOption, SlashCommandBooleanOption, SlashCommandIntegerOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const axios = require('axios');
 
@@ -5,49 +6,37 @@ const { Pxls } = require('../../api/pxls');
 const { Image } = require('../../api/image');
 
 module.exports = {
-	name: 'process',
-	description: 'Process a template image to the current Pxls palette.',
-	aliases: [],
-	// aliases: ['fiddle'],
+	data: new SlashCommandBuilder()
+		.setName('process')
+		.setDescription('Process a template image to the current Pxls palette.')
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('link')
+				.setDescription('The link to the image you are processing.')
+				.setRequired(true),
+		)
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('matching')
+				.setDescription('The type of palette matching to use. Default is "accurate".')
+				.setRequired(false)
+				.addChoices([['fast', 'fast'], ['accurate', 'accurate']]),
+		)
+		.addBooleanOption(
+			new SlashCommandBooleanOption()
+				.setName('dithering')
+				.setDescription('Whether or not to use dithering. Default is false.')
+				.setRequired(false),
+		)
+		.addIntegerOption(
+			new SlashCommandIntegerOption()
+				.setName('threshold')
+				.setDescription('The threshold for dithering mixes. Can be 0-100. Default is 20.')
+				.setRequired(false),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,
-	options: [
-		{
-			name: 'link',
-			type: 'STRING',
-			description: 'The link to the image you are processing.',
-			required: true,
-		},
-		{
-			name: 'matching',
-			type: 'STRING',
-			description: 'The type of palette matching to use. Default is \'accurate\'.',
-			required: false,
-			choices: [
-				{
-					name: 'fast',
-					value: 'fast',
-				},
-				{
-					name: 'accurate',
-					value: 'accurate',
-				},
-			],
-		},
-		{
-			name: 'dithering',
-			type: 'BOOLEAN',
-			description: 'Whether or not to use dithering. Default is false.',
-			required: false,
-		},
-		{
-			name: 'threshold',
-			type: 'NUMBER',
-			description: 'The threshold for dithering mixes. Can be 0-100. Default is 20.',
-			required: false,
-		},
-	],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

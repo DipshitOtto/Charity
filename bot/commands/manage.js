@@ -4,155 +4,133 @@ const canvas = require('../../handlers/canvas');
 const pagination = require('../handlers/pagination');
 
 const axios = require('axios');
+const { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandRoleOption } = require('@discordjs/builders');
+const { ChannelType } = require('discord-api-types/v9');
 const Discord = require('discord.js');
 
 const interactionData = {};
 const interactionDataTimeout = [];
 
 module.exports = {
-	name: 'manage',
-	description: 'Manage information, progress, and monitors for this server. Faction Admin Command.',
-	aliases: [],
+	data: new SlashCommandBuilder()
+		.setName('manage')
+		.setDescription('Manage information, progress, and monitors for this server. Faction Admin Command.')
+		.addSubcommandGroup(
+			new SlashCommandSubcommandGroupBuilder()
+				.setName('template')
+				.setDescription('Manage a template in the template progress checker.')
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('add')
+						.setDescription('Add a template to the progress checker.')
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('name')
+								.setDescription('The name of the template you want to add to the progress checker.')
+								.setRequired(true),
+						)
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('link')
+								.setDescription('The template link of the template you want to add to the progress checker.')
+								.setRequired(true),
+						),
+				)
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('remove')
+						.setDescription('Remove a template from the progress checker.')
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('name')
+								.setDescription('The name of the template you want to remove from the progress checker.')
+								.setRequired(true),
+						),
+				)
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('update')
+						.setDescription('Update a template in the progress checker.')
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('name')
+								.setDescription('The name of the template you want to update in the progress checker.')
+								.setRequired(true),
+						)
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('link')
+								.setDescription('The template link of the template you want to update in the progress checker.')
+								.setRequired(true),
+						),
+				)
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('list')
+						.setDescription('List the templates in the progress checker.'),
+				),
+		)
+		.addSubcommandGroup(
+			new SlashCommandSubcommandGroupBuilder()
+				.setName('alert')
+				.setDescription('Manage grief alert for a template in the template progress checker.')
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('add')
+						.setDescription('Add grief alert for a template.')
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('type')
+								.setDescription('The type of grief alert you want to add to the template.')
+								.setRequired(true)
+								.addChoices([['basic', 'basic'], ['advanced', 'advanced']]),
+						)
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('name')
+								.setDescription('The name of the template to alert griefs for.')
+								.setRequired(true),
+						)
+						.addChannelOption(
+							new SlashCommandChannelOption()
+								.setName('channel')
+								.setDescription('The channel grief alerts should be sent to.')
+								.setRequired(true)
+								.addChannelType(ChannelType.GuildText),
+						)
+						.addIntegerOption(
+							new SlashCommandIntegerOption()
+								.setName('threshold')
+								.setDescription('The amount of griefers required for grief alert to trigger a ping. Not required for basic alerts.')
+								.setRequired(false),
+						)
+						.addRoleOption(
+							new SlashCommandRoleOption()
+								.setName('role')
+								.setDescription('The role to ping when the threshold is hit. Not required for basic alerts.')
+								.setRequired(false),
+						),
+				)
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('remove')
+						.setDescription('Remove grief alert for a template.')
+						.addStringOption(
+							new SlashCommandStringOption()
+								.setName('name')
+								.setDescription('The name of the template to remove grief alert for.')
+								.setRequired(true),
+						),
+				)
+				.addSubcommand(
+					new SlashCommandSubcommandBuilder()
+						.setName('list')
+						.setDescription('List the templates with grief alert.'),
+				),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
-	options: [
-		{
-			name: 'template',
-			type: 'SUB_COMMAND_GROUP',
-			description: 'Manage a template in the template progress checker.',
-			options: [
-				{
-					name: 'add',
-					type: 'SUB_COMMAND',
-					description: 'Add a template to the progress checker.',
-					options: [
-						{
-							name: 'name',
-							type: 'STRING',
-							description: 'The name of the template you want to add to the progress checker.',
-							required: true,
-						},
-						{
-							name: 'link',
-							type: 'STRING',
-							description: 'The template link of the template you want to add to the progress checker.',
-							required: true,
-						},
-					],
-				},
-				{
-					name: 'remove',
-					type: 'SUB_COMMAND',
-					description: 'Remove a template from the progress checker.',
-					options: [
-						{
-							name: 'name',
-							type: 'STRING',
-							description: 'The name of the template you want to remove from the progress checker.',
-							required: true,
-						},
-					],
-				},
-				{
-					name: 'update',
-					type: 'SUB_COMMAND',
-					description: 'Update a template in the progress checker.',
-					options: [
-						{
-							name: 'name',
-							type: 'STRING',
-							description: 'The name of the template you want to update in the progress checker.',
-							required: true,
-						},
-						{
-							name: 'link',
-							type: 'STRING',
-							description: 'The template link of the template you want to update in the progress checker.',
-							required: true,
-						},
-					],
-				},
-				{
-					name: 'list',
-					type: 'SUB_COMMAND',
-					description: 'List the templates in the progress checker.',
-				},
-			],
-		},
-		{
-			name: 'alert',
-			type: 'SUB_COMMAND_GROUP',
-			description: 'Manage grief alert for a template in the template progress checker.',
-			options: [
-				{
-					name: 'add',
-					type: 'SUB_COMMAND',
-					description: 'Add grief alert for a template.',
-					options: [
-						{
-							name: 'type',
-							type: 'STRING',
-							description: 'The type of grief alert you want to add to the template.',
-							required: true,
-							choices: [
-								{
-									name: 'basic',
-									value: 'basic',
-								},
-								{
-									name: 'advanced',
-									value: 'advanced',
-								},
-							],
-						},
-						{
-							name: 'name',
-							type: 'STRING',
-							description: 'The name of the template to alert griefs for.',
-							required: true,
-						},
-						{
-							name: 'channel',
-							type: 'CHANNEL',
-							description: 'The channel grief alerts should be sent to.',
-							required: true,
-						},
-						{
-							name: 'threshold',
-							type: 'INTEGER',
-							description: 'The amount of griefers required for grief alert to trigger a ping. Not required for basic alerts.',
-							required: false,
-						},
-						{
-							name: 'role',
-							type: 'ROLE',
-							description: 'The role to ping when the threshold is hit. Not required for basic alerts.',
-							required: false,
-						},
-					],
-				},
-				{
-					name: 'remove',
-					type: 'SUB_COMMAND',
-					description: 'Remove grief alert for a template.',
-					options: [
-						{
-							name: 'name',
-							type: 'STRING',
-							description: 'The name of the template to remove grief alert for.',
-							required: true,
-						},
-					],
-				},
-				{
-					name: 'list',
-					type: 'SUB_COMMAND',
-					description: 'List the templates with grief alert.',
-				},
-			],
-		},
-	],
 	async template(interaction, subcommand, stage) {
 		if (subcommand.name === 'add') {
 			if (stage === 0) {

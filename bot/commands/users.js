@@ -1,15 +1,15 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 const pxls = require('../../handlers/pxls');
 
 module.exports = {
-	name: 'users',
-	description: 'Gets the number of users placing on the canvas.',
-	aliases: [],
+	data: new SlashCommandBuilder()
+		.setName('users')
+		.setDescription('Gets the number of users placing on the canvas.'),
 	guildOnly: true,
 	permissions: '',
 	cooldown: 3,
-	options: [],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

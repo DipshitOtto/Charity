@@ -1,24 +1,22 @@
+const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const axios = require('axios');
 
 const canvas = require('../../handlers/canvas');
 
 module.exports = {
-	name: 'detemplatize',
-	description: 'Get the original 1:1 image from a template link.',
-	aliases: [],
-	// aliases: ['detemp'],
+	data: new SlashCommandBuilder()
+		.setName('detemplatize')
+		.setDescription('Get the original 1:1 image from a template link.')
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('link')
+				.setDescription('The link to the template you are detemplatizing.')
+				.setRequired(true),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 10,
-	options: [
-		{
-			name: 'link',
-			type: 'STRING',
-			description: 'The link to the template you are detemplatizing.',
-			required: true,
-		},
-	],
 	async execute(interaction) {
 		const templateLink = interaction.options.get('link');
 

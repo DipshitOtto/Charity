@@ -1,16 +1,15 @@
 const canvas = require('../../handlers/canvas');
 
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 module.exports = {
-	name: 'board',
-	description: 'Gets the current state of the canvas.',
-	aliases: [],
-	// aliases: ['canvas'],
+	data: new SlashCommandBuilder()
+		.setName('board')
+		.setDescription('Gets the current state of the canvas.'),
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,
-	options: [],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

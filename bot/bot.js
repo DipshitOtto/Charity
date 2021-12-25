@@ -17,7 +17,7 @@ module.exports = {
 
 		for (const file of commandFiles) {
 			const command = require(`./commands/${file}`);
-			client.commands.set(command.name, command);
+			client.commands.set(command.data.name, command);
 		}
 
 		client.once('ready', () => {
@@ -64,32 +64,22 @@ module.exports = {
 
 				for (const file of commandFiles) {
 					const commandFile = require(`./commands/${file}`);
-					if (commandFile.options) {
-						data.push({
-							'name': commandFile.name,
-							'description': commandFile.description,
-							'options': commandFile.options,
-						});
-						for (const alias of commandFile.aliases) {
-							data.push({
-								'name': alias,
-								'description': commandFile.description,
-								'options': commandFile.options,
-							});
-						}
-					}
+					data.push(commandFile.data.toJSON());
 				}
 				const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
 				(async () => {
 					try {
-						console.log('Started refreshing application (/) commands.');
+						let embed = new Discord.MessageEmbed()
+							.setColor(process.env.BOT_COLOR)
+							.setDescription(':thinking: Deploying all slash commands globally...');
+						message.channel.send({ embeds: [embed] });
 
 						await rest.put(
 							Routes.applicationCommands(process.env.APP_ID),
 							{ body: data },
 						);
 
-						const embed = new Discord.MessageEmbed()
+						embed = new Discord.MessageEmbed()
 							.setColor(process.env.BOT_COLOR)
 							.setDescription(':white_check_mark: Deployed all slash commands globally!');
 						message.channel.send({ embeds: [embed] });
@@ -103,12 +93,7 @@ module.exports = {
 				const guild = message.guild.id;
 				if (args[0] === 'add') {
 					const slashCommand = client.commands.get(args[1]) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(args[1]));
-					const data = {
-						'name': slashCommand.name,
-						'description': slashCommand.description,
-						'options': slashCommand.options,
-					};
-					await client.guilds.cache.get(guild)?.commands.create(data);
+					await client.guilds.cache.get(guild)?.commands.create(slashCommand.data);
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
 						.setDescription(`:white_check_mark: Added slash command ${args[1]}!`);
@@ -181,12 +166,12 @@ module.exports = {
 
 			}
 
-			if (!cooldowns.has(command.name)) {
-				cooldowns.set(command.name, new Discord.Collection());
+			if (!cooldowns.has(command.data.name)) {
+				cooldowns.set(command.data.name, new Discord.Collection());
 			}
 
 			const now = Date.now();
-			const timestamps = cooldowns.get(command.name);
+			const timestamps = cooldowns.get(command.data.name);
 			const cooldownAmount = (command.cooldown || 3) * 1000;
 
 			if (timestamps.has(interaction.user.id)) {
@@ -196,7 +181,7 @@ module.exports = {
 					const timeLeft = (expirationTime - now) / 1000;
 					const embed = new Discord.MessageEmbed()
 						.setColor(process.env.BOT_COLOR)
-						.setDescription(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`/${command.name}\` command.`);
+						.setDescription(`:x: Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`/${command.data.name}\` command.`);
 					await interaction.reply({ embeds: [embed], ephemeral: true });
 				}
 			} else {

@@ -1,22 +1,21 @@
 const canvas = require('../../handlers/canvas');
 
+const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 module.exports = {
-	name: 'color',
-	description: 'Preview a hex/rgb/named color.',
-	aliases: [],
+	data: new SlashCommandBuilder()
+		.setName('color')
+		.setDescription('Preview a hex/rgb/named color.')
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('color')
+				.setDescription('Color to be previewed. Can be a 3 or 6 character hex code, an rgb array, or a color name.')
+				.setRequired(true),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 5,
-	options: [
-		{
-			name: 'color',
-			type: 'STRING',
-			description: 'Color to be previewed. Can be a 3 or 6 character hex code, an rgb array, or a color name.',
-			required: true,
-		},
-	],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

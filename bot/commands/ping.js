@@ -1,14 +1,14 @@
 const fs = require('fs');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 module.exports = {
-	name: 'ping',
-	description: 'Pong!',
-	aliases: [],
+	data: new SlashCommandBuilder()
+		.setName('ping')
+		.setDescription('Pong!'),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 3,
-	options: [],
 	execute(interaction, client) {
 		fs.readFile('./bot/assets/profile.png', async function(err, buffer) {
 			const embed = new Discord.MessageEmbed()

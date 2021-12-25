@@ -1,3 +1,4 @@
+const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 const pxls = require('../../handlers/pxls');
@@ -5,21 +6,18 @@ const database = require('../../handlers/database');
 const canvas = require('../../handlers/canvas');
 
 module.exports = {
-	name: 'template',
-	description: 'Get a template link from a template in the progress checker.',
-	aliases: [],
-	// aliases: ['project', 'temp'],
+	data: new SlashCommandBuilder()
+		.setName('template')
+		.setDescription('Get a template link from a template in the progress checker.')
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('name')
+				.setDescription('The name of the template link to get.')
+				.setRequired(true),
+		),
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,
-	options: [
-		{
-			name: 'name',
-			type: 'STRING',
-			description: 'The name of the template link to get.',
-			required: true,
-		},
-	],
 	async execute(interaction) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 

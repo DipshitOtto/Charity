@@ -1,22 +1,20 @@
 const fs = require('fs');
+const { SlashCommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 module.exports = {
-	name: 'help',
-	description: 'List all commands or get info about a specific command.',
-	aliases: [],
-	// aliases: ['commands'],
+	data: new SlashCommandBuilder()
+		.setName('help')
+		.setDescription('List all commands or get info about a specific command.')
+		.addStringOption(
+			new SlashCommandStringOption()
+				.setName('command')
+				.setDescription('The command to get info about.')
+				.setRequired(false),
+		),
 	guildOnly: false,
 	permissions: '',
 	cooldown: 1,
-	options: [
-		{
-			name: 'command',
-			type: 'STRING',
-			description: 'The command to get info about.',
-			required: false,
-		},
-	],
 	execute(interaction, client) {
 		const argument = interaction.options.get('command');
 
@@ -48,28 +46,29 @@ module.exports = {
 
 			if (!argument) {
 				for (const command of commands) {
+					console.log(command);
 					let usage = '';
-					for (let i = 0; i < command[1].options.length; i++) {
+					for (let i = 0; i < command[1].data.options.length; i++) {
 						if (i < 2) {
-							if (command[1].options[i].type === 'SUB_COMMAND' || command[1].options[i].type === 'SUB_COMMAND_GROUP') {
+							if (command[1].data.options[i].type === 'SUB_COMMAND' || command[1].data.options[i].type === 'SUB_COMMAND_GROUP') {
 								if (i === 0) {
-									usage += ` {${command[1].options[i].name}`;
-								} else if (i === command[1].options.length - 1) {
-									usage += `|${command[1].options[i].name}}`;
+									usage += ` {${command[1].data.options[i].name}`;
+								} else if (i === command[1].data.options.length - 1) {
+									usage += `|${command[1].data.options[i].name}}`;
 								} else {
-									usage += `|${command[1].options[i].name}`;
+									usage += `|${command[1].data.options[i].name}`;
 								}
-							} else if (command[1].options[i].required) {
-								usage += ` <${command[1].options[i].name}>`;
+							} else if (command[1].data.options[i].required) {
+								usage += ` <${command[1].data.options[i].name}>`;
 							} else {
-								usage += ` [${command[1].options[i].name}]`;
+								usage += ` [${command[1].data.options[i].name}]`;
 							}
 						} else {
 							usage += '...';
 							break;
 						}
 					}
-					data.push(`• \`/${command[1].name}${usage}\` - ${command[1].description}`);
+					data.push(`• \`/${command[1].data.name}${usage}\` - ${command[1].data.description}`);
 				}
 				data.push('\nYou can send `/help [command]` to get info on a specific command!');
 

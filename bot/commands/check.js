@@ -1,3 +1,4 @@
+const { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandStringOption } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
 const pxls = require('../../handlers/pxls');
@@ -9,53 +10,35 @@ const interactionData = {};
 const interactionDataTimeout = [];
 
 module.exports = {
-	name: 'check',
-	description: 'Check the progress of any template in the progress checker.',
-	aliases: [],
-	// aliases: ['check'],
+	data: new SlashCommandBuilder()
+		.setName('check')
+		.setDescription('Check the progress of any template in the progress checker.')
+		.addSubcommand(
+			new SlashCommandSubcommandBuilder()
+				.setName('list')
+				.setDescription('List the templates in the progress checker.'),
+		)
+		.addSubcommand(
+			new SlashCommandSubcommandBuilder()
+				.setName('progress')
+				.setDescription('Check the progress of any template in the progress checker.')
+				.addStringOption(
+					new SlashCommandStringOption()
+						.setName('name')
+						.setDescription('The name of the template you want to check the progress of.')
+						.setRequired(true),
+				)
+				.addStringOption(
+					new SlashCommandStringOption()
+						.setName('display')
+						.setDescription('How to display the template. Can be "difference", "actual", or "template". Defaults to "difference".')
+						.setRequired(false)
+						.addChoices([['difference', 'difference'], ['actual', 'actual'], ['template', 'template']]),
+				),
+		),
 	guildOnly: true,
 	permissions: '',
 	cooldown: 10,
-	options: [
-		{
-			name: 'list',
-			type: 'SUB_COMMAND',
-			description: 'List the templates in the progress checker.',
-		},
-		{
-			name: 'progress',
-			type: 'SUB_COMMAND',
-			description: 'Check the progress of any template in the progress checker.',
-			options: [
-				{
-					name: 'name',
-					type: 'STRING',
-					description: 'The name of the template you want to check the progress of.',
-					required: true,
-				},
-				{
-					name: 'display',
-					type: 'STRING',
-					description: 'How to display the template. Can be "difference", "actual", or "template". Defaults to "difference".',
-					required: false,
-					choices: [
-						{
-							name: 'difference',
-							value: 'difference',
-						},
-						{
-							name: 'actual',
-							value: 'actual',
-						},
-						{
-							name: 'template',
-							value: 'template',
-						},
-					],
-				},
-			],
-		},
-	],
 	async execute(interaction, stage = 0) {
 		if (!interaction.deferred && !interaction.replied) await interaction.deferReply();
 
